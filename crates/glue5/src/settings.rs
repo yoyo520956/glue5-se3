@@ -259,7 +259,10 @@ pub fn auto_max_fps(ram_mb: i32, mobile: bool) -> u32 {
 
 impl Default for Settings {
     fn default() -> Self {
-        let ram = sdl3::cpuinfo::system_ram();
+        // Only phones ask the system for their RAM: on a desktop the answer
+        // would not change anything, and asking costs an SDL call the
+        // settings do not otherwise need.
+        let ram = if MOBILE { sdl3::cpuinfo::system_ram() } else { 0 };
         Settings {
             game_dir: None,
             source: if TV { Source::Server } else { Source::Folder },
@@ -359,7 +362,8 @@ impl Settings {
     /// desktop and 720 on phones and tablets (what the game ran at before:
     /// its GPU time grows with the pixels, and phone screens have many).
     pub fn for_screen(&mut self, height: u32) {
-        self.for_screen_with(height, sdl3::cpuinfo::system_ram())
+        let ram = if MOBILE { sdl3::cpuinfo::system_ram() } else { 0 };
+        self.for_screen_with(height, ram)
     }
 
     /// [`Settings::for_screen`] for a device with `ram_mb` of memory. Split
