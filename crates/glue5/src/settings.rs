@@ -203,24 +203,77 @@ impl TouchAim {
 /// game takes about 4 GB at the normal one).
 const LOW_MEMORY_RAM_MB: i32 = 7000;
 
+/// 4 GB devices (an iPhone SE 3 reports 4 GB): the engine wants about 3 GB,
+/// leaving little for render targets, so they draw fewer pixels and let a
+/// temporal upscaler put the detail back. A phone that reports 4096 MB can
+/// round either way by a page or two, hence the margin.
+const TINY_RAM_MB: i32 = 5200;
+
 /// The render scale's range, in steps of 5%.
 pub const RENDER_SCALES: std::ops::RangeInclusive<f32> = 0.25..=1.0;
 
+/// The height a phone renders at, before upscaling, for its RAM and its
+/// screen. 720 lines is what GLUE 5 has always used on phones; a 4 GB phone
+/// with a small screen takes 600 (0.8x of a 750-line screen) because it
+/// cannot feed the GPU fast enough to hold a steady frame otherwise, and
+/// the temporal upscaler recovers what the missing pixels cost.
+///
+/// A big low-memory screen (an older iPad) keeps 720: scaling it down to
+/// 600 lines would leave the upscaler too much to invent.
+pub fn auto_render_height(ram_mb: i32, screen_h: u32) -> u32 {
+    if ram_mb >= LOW_MEMORY_RAM_MB {
+        return 720;
+    }
+    if ram_mb < TINY_RAM_MB && screen_h <= 800 {
+        return 600;
+    }
+    720
+}
+
+/// The upscaler to start with: MetalFX Temporal on a 4 GB Apple phone, where
+/// the lower render scale needs the temporal one's sharper result to make up
+/// for it; MetalFX's spatial one everywhere else (cheaper, and what the
+/// published benchmarks ran at).
+pub fn auto_upscaler(ram_mb: i32, ios: bool) -> Upscaling {
+    if ios && ram_mb < TINY_RAM_MB {
+        Upscaling::MetalFxTemporal
+    } else {
+        Upscaling::MetalFx
+    }
+}
+
+/// The frame cap to start with. 30 on a 4 GB phone: an even half of the
+/// display's 60 Hz looks smoother than a rate that drifts between 30 and 60,
+/// and it keeps the phone cool enough not to throttle mid-session. A desktop
+/// with little RAM keeps no cap: it has a fan and a page file.
+pub fn auto_max_fps(ram_mb: i32, mobile: bool) -> u32 {
+    if !mobile {
+        return 0;
+    }
+    if ram_mb < TINY_RAM_MB {
+        30
+    } else {
+        60
+    }
+}
+
 impl Default for Settings {
     fn default() -> Self {
+        let ram = sdl3::cpuinfo::system_ram();
         Settings {
             game_dir: None,
             source: if TV { Source::Server } else { Source::Folder },
             server: String::new(),
             share: false,
             download_all: false,
-            low_memory: MOBILE && sdl3::cpuinfo::system_ram() < LOW_MEMORY_RAM_MB,
+            low_memory: MOBILE && ram < LOW_MEMORY_RAM_MB,
             low_preset_written: false,
             render_scale: None,
             vsync: true,
-            // Phones hold a steady 60 for longer than they hold 120 (heat).
-            max_fps: if MOBILE { 60 } else { 0 },
-            upscaler: Upscaling::MetalFx,
+            // Phones hold a steady 60 for longer than they hold 120 (heat);
+            // a 4 GB one holds a steady 30 for longer still.
+            max_fps: auto_max_fps(ram, MOBILE),
+            upscaler: auto_upscaler(ram, cfg!(target_os = "ios")),
             sharpness: 0.5,
             frame_generation: false,
             gpu_driver: None,
@@ -306,8 +359,19 @@ impl Settings {
     /// desktop and 720 on phones and tablets (what the game ran at before:
     /// its GPU time grows with the pixels, and phone screens have many).
     pub fn for_screen(&mut self, height: u32) {
+        self.for_screen_with(height, sdl3::cpuinfo::system_ram())
+    }
+
+    /// [`Settings::for_screen`] for a device with `ram_mb` of memory. Split
+    /// out so the tests can choose the memory instead of reading the machine
+    /// they run on.
+    pub fn for_screen_with(&mut self, height: u32, ram_mb: i32) {
         if self.render_scale.is_none() {
-            let lines = self.render_height.take().unwrap_or(if MOBILE { 720 } else { 1080 });
+            let lines = self.render_height.take().unwrap_or(if MOBILE {
+                auto_render_height(ram_mb, height)
+            } else {
+                1080
+            });
             self.render_scale = Some(round_scale(lines as f32 / height.max(1) as f32));
         }
     }
@@ -389,5 +453,35 @@ mod tests {
         let mut s = Settings::default();
         s.for_screen(1170);
         assert_eq!(s.render_scale, Some(if MOBILE { 0.6 } else { 0.9 }));
+    }
+
+    /// An iPhone SE 3 (4 GB, 1334x750) draws 600 lines and lets the temporal
+    /// upscaler fill the rest: 1068x600 upscaled to 1334x750, at a steady 30.
+    #[test]
+    fn four_gb_phone_profile() {
+        let lines = auto_render_height(4096, 750);
+        assert_eq!(lines, 600);
+        assert_eq!(round_scale(lines as f32 / 750.0), 0.8);
+        assert_eq!(render_size((1334, 750), 0.8, true), (1068, 600));
+        assert_eq!(auto_upscaler(4096, true), Upscaling::MetalFxTemporal);
+        assert_eq!(auto_max_fps(4096, true), 30);
+        assert_eq!(auto_max_fps(4096, false), 0);
+    }
+
+    /// A phone with more RAM keeps the profile the published benchmarks ran
+    /// at: 720 lines, MetalFX's spatial upscaler, 60 fps.
+    #[test]
+    fn six_gb_phone_keeps_published_profile() {
+        assert_eq!(auto_render_height(6144, 1170), 720);
+        assert_eq!(auto_upscaler(6144, true), Upscaling::MetalFx);
+        assert_eq!(auto_max_fps(6144, true), 60);
+        assert_eq!(auto_max_fps(6144, false), 0);
+    }
+
+    /// A 4 GB device with a big screen stays at 720 lines: scaling it down
+    /// to 600 would leave the upscaler too much to invent.
+    #[test]
+    fn four_gb_big_screen_keeps_720() {
+        assert_eq!(auto_render_height(4096, 2048), 720);
     }
 }
