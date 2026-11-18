@@ -506,7 +506,7 @@ impl App {
                 if exit == Exit::Restart {
                     if MOBILE {
                         // A phone app cannot start itself again: says so before it ends.
-                        let text = "The new settings apply when Glue 5 is opened again.";
+                        let text = "新设置将在 Glue 5 重新打开后生效。";
                         let flag = sdl3::messagebox::MessageBoxFlag::INFORMATION;
                         let _ = sdl3::messagebox::show_simple_message_box(flag, "Glue 5", text, &self.window);
                     }
@@ -1121,7 +1121,7 @@ impl App {
                 r.min_fps,
                 r.smooth * 100.0
             ),
-            None => "The benchmark is over.".into(),
+            None => "跑分结束。".into(),
         };
         let flag = sdl3::messagebox::MessageBoxFlag::INFORMATION;
         let _ = sdl3::messagebox::show_simple_message_box(flag, "Glue 5", &text, &self.window);
@@ -1153,8 +1153,8 @@ impl App {
             &[ButtonData { flags: Button::RETURNKEY_DEFAULT, button_id: 0, text: "OK" }]
         } else {
             &[
-                ButtonData { flags: Button::ESCAPEKEY_DEFAULT, button_id: 0, text: "Quit" },
-                ButtonData { flags: Button::RETURNKEY_DEFAULT, button_id: 1, text: "Start page" },
+                ButtonData { flags: Button::ESCAPEKEY_DEFAULT, button_id: 0, text: "退出" },
+                ButtonData { flags: Button::RETURNKEY_DEFAULT, button_id: 1, text: "起始页" },
             ]
         };
         let shown =
@@ -1884,7 +1884,7 @@ impl Pick {
     /// A zip file (Android: a content:// URI, which SDL opens too).
     fn zip(window: &sdl3::video::Window) -> Pick {
         let picked = Picked::default();
-        let filters = [sdl3::dialog::DialogFileFilter { name: "Zip archives", pattern: "zip" }];
+        let filters = [sdl3::dialog::DialogFileFilter { name: "ZIP 压缩包", pattern: "zip" }];
         if let Err(e) = sdl3::dialog::show_open_file_dialog(&filters, None::<&str>, false, window, Pick::answer(&picked)) {
             log::warn!("no file picker: {e:?}");
             *picked.lock().unwrap() = Some(None);

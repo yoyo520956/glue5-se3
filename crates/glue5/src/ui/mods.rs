@@ -95,12 +95,12 @@ const ERR: Color32 = Color32::from_rgb(240, 149, 149);
 pub(super) fn summary(settings: &Settings, status: &Status) -> String {
     match status.started.as_ref() {
         Some(s) if s.mods != settings.mods => {
-            return if settings.mods { "On from the next start".into() } else { "Off from the next start".into() };
+            return if settings.mods { "下次启动时开启".into() } else { "下次启动时关闭".into() };
         }
         _ => {}
     }
     if !settings.mods {
-        return "Off · scripts that change the game".into();
+        return "关闭 · 改变游戏的脚本".into();
     }
     let mods = glue5_mods::mods();
     let mut parts = vec!["On".to_owned()];
@@ -114,7 +114,7 @@ pub(super) fn summary(settings: &Settings, status: &Status) -> String {
         parts.push(format!("{running} running"));
     }
     if status.studio.is_some() {
-        parts.push("Studio on".into());
+        parts.push("Studio 已开启".into());
     }
     parts.join(" · ")
 }
@@ -123,14 +123,14 @@ pub(super) fn summary(settings: &Settings, status: &Status) -> String {
 /// into the Studio.
 pub(super) fn home_card(ui: &mut egui::Ui, settings: &Settings, status: &Status, go: &mut Option<Option<super::Page>>) {
     let state = match status.started.as_ref() {
-        Some(s) if !s.mods => ("Next start", WARN),
+        Some(s) if !s.mods => ("下次启动", WARN),
         _ => ("On", super::pages::READY),
     };
     card_title(ui, "MODS", Some(state));
     let mods = glue5_mods::mods();
     let running = mods.iter().filter(|m| m.state == ModState::Running).count();
     let mut line = match mods.len() {
-        0 => "No mods yet".to_owned(),
+        0 => "暂无模组".to_owned(),
         1 => "1 mod".to_owned(),
         n => format!("{n} mods"),
     };
@@ -139,18 +139,18 @@ pub(super) fn home_card(ui: &mut egui::Ui, settings: &Settings, status: &Status,
     }
     match &status.studio {
         Some(info) => {
-            line.push_str(if info.lan { " · Studio on this network" } else { " · Studio on this device" });
+            line.push_str(if info.lan { " · Studio 在本网络中" } else { " · Studio 在本机" });
             small(ui, &line, theme::MUTED);
             let address = info.url.trim_end_matches('/').to_owned();
             ui.label(RichText::new(format!("{address}  ·  code {}", info.code)).monospace().color(Color32::WHITE));
             let [open, control, copy, page] = <[_; 4]>::try_from(
-                ui.horizontal(|ui| action_buttons(ui, &["Open Studio", "Control", "Copy address", "Mods"])).inner,
+                ui.horizontal(|ui| action_buttons(ui, &["打开 Studio", "Control", "复制地址", "模组"])).inner,
             )
             .unwrap();
-            if open.on_hover_text("In this device's browser").clicked() {
+            if open.on_hover_text("在本机浏览器中").clicked() {
                 ui.ctx().open_url(egui::OpenUrl::new_tab(info.paired(&info.url)));
             }
-            if control.on_hover_text("The mods' menus, in this device's browser").clicked() {
+            if control.on_hover_text("模组菜单，在本机浏览器中").clicked() {
                 ui.ctx().open_url(egui::OpenUrl::new_tab(info.paired(&info.control)));
             }
             if copy.clicked() {
@@ -162,10 +162,10 @@ pub(super) fn home_card(ui: &mut egui::Ui, settings: &Settings, status: &Status,
         }
         None => {
             if !settings.studio {
-                line.push_str(" · Studio off");
+                line.push_str(" · Studio 关闭");
             }
             small(ui, &line, theme::MUTED);
-            if ui.horizontal(|ui| action_button(ui, "Mods")).inner.clicked() {
+            if ui.horizontal(|ui| action_button(ui, "模组")).inner.clicked() {
                 *go = Some(Some(super::Page::Mods));
             }
         }
@@ -192,17 +192,17 @@ pub(super) fn mods_page(ctx: &egui::Context, page: &mut ModsPage, settings: &mut
         let running_with = status.started.as_ref().map(|s| s.mods);
         let note = match running_with {
             Some(with) if with != settings.mods => {
-                Some(if settings.mods { "On from the next start of the game" } else { "Off from the next start; running mods keep going until then" })
+                Some(if settings.mods { "游戏下次启动时开启" } else { "下次启动时关闭；正在运行的模组会持续到那时" })
             }
             _ => None,
         };
-        setting(ui, "Mods", Control::Toggle, Some(note.unwrap_or("Luau scripts that change the game, run with it")), |ui| {
+        setting(ui, "模组", Control::Toggle, Some(note.unwrap_or("改变游戏的 Luau 脚本，随游戏运行")), |ui| {
             toggle(ui, &mut settings.mods);
         });
         if !settings.mods && !status.mods {
             ui.add_space(4.0 * scale);
             panel(ui, |ui| {
-                card_title(ui, "WHAT MODS ARE", None);
+                card_title(ui, "什么是模组", None);
                 small(
                     ui,
                     "A mod is a folder of Luau scripts that call the game's own functions: spawn a car, change \
@@ -251,13 +251,13 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
     let mods = glue5_mods::mods();
     if mods.is_empty() {
         panel(ui, |ui| {
-            card_title(ui, "NO MODS YET", None);
-            small(ui, "Write one in GLUE 5 Studio, from a browser on this network.", theme::MUTED);
+            card_title(ui, "暂无模组", None);
+            small(ui, "在本网络的浏览器中用 GLUE 5 Studio 编写。", theme::MUTED);
             if let Some(dir) = glue5_mods::dir().filter(|_| !crate::paths::MOBILE) {
                 small(ui, &format!("Or put a folder with a main.luau in {}", dir.display()), theme::MUTED);
             }
             ui.add_space(4.0 * theme::density(ui));
-            if inline_button(ui, "Open Studio").clicked() {
+            if inline_button(ui, "打开 Studio").clicked() {
                 page.tab = Tab::Studio;
             }
         });
@@ -267,7 +267,7 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
     if !status.mods {
         for m in &mods {
             let mut on = m.info.autostart;
-            let note = if on { "Starts with the game" } else { "Not started with the game" };
+            let note = if on { "随游戏启动" } else { "未随游戏启动" };
             setting(ui, &m.info.title, Control::Toggle, Some(note), |ui| {
                 if toggle(ui, &mut on).changed()
                     && let Err(e) = glue5_mods::set_autostart(&m.name, on)
@@ -280,11 +280,11 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
     }
     for m in &mods {
         let subtitle = match m.state {
-            ModState::Running if m.waiting => "Waiting".to_owned(),
+            ModState::Running if m.waiting => "等待中".to_owned(),
             ModState::Running => format!("Running · {:.1} ms per frame", m.cpu_ms),
             ModState::Error => format!("Error · {}", m.error.as_deref().unwrap_or("")),
-            ModState::Stopped if m.info.autostart => "Stopped · starts with the game".to_owned(),
-            ModState::Stopped => "Stopped".to_owned(),
+            ModState::Stopped if m.info.autostart => "已停止 · 随游戏启动".to_owned(),
+            ModState::Stopped => "已停止".to_owned(),
         };
         let dot = match m.state {
             ModState::Running => "• ",
@@ -292,7 +292,7 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
         };
         setting(ui, &format!("{dot}{}", m.info.title), Control::Action, Some(&subtitle), |ui| {
             let running = m.state == ModState::Running;
-            if action_button(ui, if running { "Stop" } else { "Start" }).clicked() {
+            if action_button(ui, if running { "停止" } else { "启动" }).clicked() {
                 if running {
                     glue5_mods::stop(&m.name);
                 } else {
@@ -305,7 +305,7 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
     if !running.is_empty() {
         let total: f32 = running.iter().map(|m| m.cpu_ms).sum();
         setting(ui, &format!("{} running", running.len()), Control::Action, Some(&format!("{total:.1} ms per frame")), |ui| {
-            if action_button(ui, "Stop all").clicked() {
+            if action_button(ui, "全部停止").clicked() {
                 for m in &running {
                     glue5_mods::stop(&m.name);
                 }
@@ -313,16 +313,16 @@ fn mods_tab(ui: &mut egui::Ui, page: &mut ModsPage, status: &Status) {
         });
     }
     if glue5_mods::tainted() {
-        small(ui, "A native failed inside the game: restart the game before long.", WARN);
+        small(ui, "游戏内有原生调用失败：请尽快重启游戏。", WARN);
     }
 }
 
 fn studio_tab(ui: &mut egui::Ui, settings: &mut Settings, status: &Status) {
-    setting(ui, "GLUE 5 Studio", Control::Toggle, Some("Write and run mods from a browser; use their menus from a phone"), |ui| {
+    setting(ui, "GLUE 5 Studio", Control::Toggle, Some("在浏览器中编写和运行模组；用手机使用其菜单"), |ui| {
         toggle(ui, &mut settings.studio);
     });
-    let others = if settings.studio_lan { "Browsers on this network pair with the code" } else { "Only a browser on this device" };
-    setting(ui, "Other devices", Control::Toggle, Some(others), |ui| {
+    let others = if settings.studio_lan { "本网络的浏览器用代码配对" } else { "仅限本机浏览器" };
+    setting(ui, "其他设备", Control::Toggle, Some(others), |ui| {
         toggle(ui, &mut settings.studio_lan);
     });
     match &status.studio {
@@ -330,12 +330,12 @@ fn studio_tab(ui: &mut egui::Ui, settings: &mut Settings, status: &Status) {
             let place = if info.lan { "on this network" } else { "on this device" };
             for (url, title, note) in [
                 (&info.url, "Studio", format!("The editor, in a browser {place}")),
-                (&info.control, "Control page", format!("The mods and their menus, for a phone or a tablet {place}")),
+                (&info.control, "控制页", format!("The mods and their menus, for a phone or a tablet {place}")),
             ] {
                 let address = format!("{title} · {}", url.trim_end_matches('/'));
                 setting(ui, &address, Control::Actions, Some(&note), |ui| {
-                    let [go, copy] = <[_; 2]>::try_from(action_buttons(ui, &["Open", "Copy"])).unwrap();
-                    if go.on_hover_text("In this device's browser, paired").clicked() {
+                    let [go, copy] = <[_; 2]>::try_from(action_buttons(ui, &["打开", "复制"])).unwrap();
+                    if go.on_hover_text("在本机浏览器中，已配对").clicked() {
                         ui.ctx().open_url(egui::OpenUrl::new_tab(info.paired(url)));
                     }
                     if copy.clicked() {
@@ -343,9 +343,9 @@ fn studio_tab(ui: &mut egui::Ui, settings: &mut Settings, status: &Status) {
                     }
                 });
             }
-            setting(ui, &info.code, Control::Actions, Some("Pairing code: a browser or an agent pairs with it once"), |ui| {
-                let [new, copy] = <[_; 2]>::try_from(action_buttons(ui, &["New", "Copy"])).unwrap();
-                if new.on_hover_text("A new code: what is paired stays paired").clicked() {
+            setting(ui, &info.code, Control::Actions, Some("配对码：浏览器或代理用它配对一次"), |ui| {
+                let [new, copy] = <[_; 2]>::try_from(action_buttons(ui, &["新", "复制"])).unwrap();
+                if new.on_hover_text("新代码：已配对的不受影响").clicked() {
                     settings.studio_code.clear();
                 }
                 if copy.clicked() {
@@ -381,18 +381,18 @@ fn paired(ui: &mut egui::Ui) {
     for p in &pairings {
         let what = match p.scope {
             glue5_mods::studio::Scope::Studio => "Studio",
-            glue5_mods::studio::Scope::Control => "Control page",
+            glue5_mods::studio::Scope::Control => "控制页",
         };
         let note = format!("{what} · used {}", ago(now.saturating_sub(p.last_used)));
         setting(ui, &p.name, Control::Actions, Some(&note), |ui| {
-            if action_button(ui, "Remove").on_hover_text("It must pair again with the code").clicked() {
+            if action_button(ui, "移除").on_hover_text("需用代码重新配对").clicked() {
                 glue5_mods::studio::pairing::forget(&p.id);
             }
         });
     }
     if pairings.len() > 1 {
-        setting(ui, "Everything paired", Control::Actions, Some("Every browser and agent pairs again"), |ui| {
-            if action_button(ui, "Remove all").clicked() {
+        setting(ui, "已全部配对", Control::Actions, Some("所有浏览器和代理需重新配对"), |ui| {
+            if action_button(ui, "全部移除").clicked() {
                 glue5_mods::studio::pairing::forget_all();
             }
         });
@@ -426,9 +426,9 @@ fn qr_row(ui: &mut egui::Ui, url: &str) {
                 qr(ui, url, 112.0 * scale);
                 ui.add_space(8.0 * scale);
                 ui.vertical(|ui| {
-                    ui.label(RichText::new("Scan to open").size(14.0 * scale).color(Color32::WHITE));
+                    ui.label(RichText::new("扫码打开").size(14.0 * scale).color(Color32::WHITE));
                     ui.label(
-                        RichText::new("With a phone's or a tablet's camera: the control page opens, paired, with the mods' menus.")
+                        RichText::new("用手机或平板摄像头扫描：控制页会打开并完成配对，包含模组菜单。")
                             .size(11.0 * scale)
                             .color(theme::MUTED),
                     );
@@ -443,7 +443,7 @@ fn log_tab(ui: &mut egui::Ui) {
     // the mods' update takes).
     let lines = glue5_mods::recent_logs(80);
     if lines.is_empty() {
-        muted(ui, "Nothing yet.");
+        muted(ui, "还没有内容。");
     }
     panel(ui, |ui| {
         for l in &lines {

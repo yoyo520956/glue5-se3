@@ -14,9 +14,14 @@ pub(super) fn install(ctx: &Context) {
     for (name, bytes) in [
         ("ui", include_bytes!("../../assets/ui/Barlow-SemiBold.ttf").as_slice()),
         ("condensed", include_bytes!("../../assets/ui/BarlowCondensed-Bold.ttf").as_slice()),
+        ("cjk", include_bytes!("../../assets/ui/NotoSansSC-Subset.otf").as_slice()),
     ] {
         fonts.font_data.insert(name.into(), FontData::from_static(bytes).into());
     }
+    // Chinese: the interface's texts are Chinese, and Barlow has no glyphs for
+    // them. Last in the list, so Latin still comes from Barlow and only the
+    // characters it lacks fall through to this one.
+    fonts.families.get_mut(&FontFamily::Proportional).unwrap().push("cjk".into());
     fonts.families.get_mut(&FontFamily::Proportional).unwrap().insert(0, "ui".into());
     let mut headings = vec!["condensed".into()];
     headings.extend(fonts.families[&FontFamily::Proportional].clone());

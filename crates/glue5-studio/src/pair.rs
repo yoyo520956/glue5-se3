@@ -33,7 +33,7 @@ pub(crate) fn pair(s: S, code: &str) {
         // 401: a wrong code; else no game to ask.
         s.pair_failed.set(status.as_f64() == Some(401.0));
         if status.as_f64() != Some(401.0) {
-            s.notice.set(Some("The game did not answer: is it still running?".into()));
+            s.notice.set(Some("游戏没有响应：它还在运行吗？".into()));
         }
         s.pairing.set(Pairing::Needed);
     });
@@ -94,8 +94,8 @@ pub(crate) fn Pair(s: S) -> impl IntoView {
     let code = RwSignal::new(String::new());
     let submit = move || pair(s, &code.get_untracked());
     let (title, what) = match mode() {
-        Mode::Studio => ("STUDIO", "Pair this browser with the game: enter the code shown in the game, under Mods › Studio."),
-        Mode::Control => ("CONTROL", "Pair this device to use the mods and their menus: enter the code shown in the game, under Mods › Studio, or scan its QR code."),
+        Mode::Studio => ("STUDIO", "将此浏览器与游戏配对：输入游戏内 模组 › Studio 显示的代码。"),
+        Mode::Control => ("CONTROL", "配对此设备以使用模组及其菜单：输入游戏内 模组 › Studio 显示的代码，或扫描其二维码。"),
     };
     view! {
         <div class="pair">
@@ -103,15 +103,15 @@ pub(crate) fn Pair(s: S) -> impl IntoView {
                 <div class="brand big"><img src="/logo.png" alt=""/><b>"GLUE 5"</b><span>{title}</span></div>
                 <p>{what}</p>
                 <Show when=move || s.pair_failed.get()>
-                    <p class="pair-error">"That code did not work: check it in the game (it changes when someone presses New)."</p>
+                    <p class="pair-error">"该代码无效：请在游戏中核对（有人点“新建”时会变化）。"</p>
                 </Show>
                 <input class="code-input" placeholder="ABCD-1234" autocomplete="off" autocapitalize="characters" spellcheck="false"
-                    inputmode="text" aria-label="Pairing code"
+                    inputmode="text" aria-label="配对码"
                     prop:value=move || code.get()
                     on:input=move |ev| code.set(event_target_value(&ev))
                     on:keydown=move |ev| if ev.key() == "Enter" { submit() } />
-                <button class="btn primary wide" on:click=move |_| submit()>"Pair"</button>
-                <p class="pair-note">"Once paired, this browser stays paired: the game lists it under Mods › Studio, where it can be removed."</p>
+                <button class="btn primary wide" on:click=move |_| submit()>"配对"</button>
+                <p class="pair-note">"配对后此浏览器会保持配对：游戏会在 模组 › Studio 下列出它，可在那里移除。"</p>
             </div>
         </div>
     }

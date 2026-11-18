@@ -23,7 +23,7 @@ pub(super) fn keep_in_view(ui: &Ui, focused: bool, rect: Rect) {
 pub(super) fn close_button(ui: &mut Ui) -> Response {
     let scale = density(ui);
     let (r, response) = ui.allocate_exact_size(vec2(44.0 * scale, 44.0 * scale), Sense::click());
-    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), "Close"));
+    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), "关闭"));
     let c = r.center();
     ui.painter().circle_filled(c, 18.0 * scale, Color32::from_gray(if response.hovered() { 60 } else { 32 }));
     for sign in [-1.0, 1.0] {
@@ -35,7 +35,7 @@ pub(super) fn close_button(ui: &mut Ui) -> Response {
     if response.has_focus() {
         ui.painter().circle_stroke(c, 20.0 * scale, Stroke::new(1.0, Color32::WHITE));
     }
-    focus(response).on_hover_text("Close")
+    focus(response).on_hover_text("关闭")
 }
 
 #[derive(Clone, Copy)]
@@ -131,9 +131,9 @@ pub(super) fn text_field(ui: &mut Ui, label: &str, kind: TextKind, text: &mut St
     if crate::paths::TOUCH && matches!(kind, TextKind::Code | TextKind::Address) && text.is_empty() {
         let paste = Rect::from_min_max(pos2(inner.right() - 56.0 * scale, rect.top()), pos2(rect.right(), rect.bottom()));
         let response = ui.interact(paste, ui.id().with((label, "paste")), Sense::click());
-        response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), "Paste"));
+        response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), "粘贴"));
         let color = if response.hovered() || response.has_focus() { Color32::WHITE } else { MUTED };
-        ui.painter().text(paste.center(), Align2::CENTER_CENTER, "Paste", FontId::proportional(13.0 * scale), color);
+        ui.painter().text(paste.center(), Align2::CENTER_CENTER, "粘贴", FontId::proportional(13.0 * scale), color);
         if response.clicked()
             && let Some(pasted) = super::clipboard_text()
         {
@@ -258,7 +258,7 @@ pub(super) fn choice<T: PartialEq + Copy>(ui: &mut Ui, value: &mut T, options: &
                         .corner_radius((10.0 * scale) as u8)
                         .min_size(vec2(38.0 * scale, 38.0 * scale))
                 };
-                let left = focus(ui.add(arrow("‹"))).on_hover_text("Previous value");
+                let left = focus(ui.add(arrow("‹"))).on_hover_text("上一个值");
                 ui.allocate_ui_with_layout(
                     vec2(value_width, 38.0 * scale),
                     Layout::centered_and_justified(Direction::LeftToRight),
@@ -266,7 +266,7 @@ pub(super) fn choice<T: PartialEq + Copy>(ui: &mut Ui, value: &mut T, options: &
                         ui.add(Label::new(RichText::new(options[index].1).size(13.0 * scale)).truncate());
                     },
                 );
-                let right = focus(ui.add(arrow("›"))).on_hover_text("Next value");
+                let right = focus(ui.add(arrow("›"))).on_hover_text("下一个值");
                 if left.clicked() {
                     *value = options[(index + options.len() - 1) % options.len()].0;
                 }
@@ -481,7 +481,7 @@ mod tests {
                         right = ui.max_rect().right() - 12.0;
                         setting(
                             ui,
-                            "Game folder",
+                            "游戏文件夹",
                             Control::Action,
                             Some("A very long folder path to truncate"),
                             |ui| {

@@ -1,4 +1,18 @@
 <p align="center">
+  <b>简体中文版</b> · 界面与游戏内文本已完整汉化 · 针对 4 GB 内存的 iPhone（SE 3 等）调校
+</p>
+
+> [!NOTE]
+> **这是 [mempage4k/glue5](https://github.com/mempage4k/glue5) 的中文分支。**
+>
+> - **汉化**：启动器界面（设置、好友、服务器、模组、制作名单、触屏按键）与游戏内补充文本（暂停菜单战局、画面设置名、差事名）全部译为简体中文；内置 Noto Sans SC 子集字体（6763 个汉字），英文与数字仍用原版 Barlow。
+> - **SE 3 调校**：4 GB 机型自动以 600 线渲染 + MetalFX Temporal 超分到原生分辨率，帧率上限 30（iOS 为 60 Hz，整数分频更稳），详见 `crates/glue5/src/settings.rs`。
+> - **许可**：沿用上游 GPL-3.0，字体为 SIL OFL 1.1，版权与出处见 `crates/glue5/assets/ui/`。
+> - **不含游戏文件**：与上游一致，需要你自备 `game.wasm` 与其数据。
+>
+> 上游说明如下（英文）。
+
+<p align="center">
   <img src="docs/images/hero.webp" alt="GLUE 5: GTA V on an iPhone, an Android phone, a MacBook Pro and an iPad" width="100%">
 </p>
 

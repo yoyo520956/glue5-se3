@@ -7,41 +7,41 @@ use egui::{Color32, RichText};
 
 /// A project: its name, what it does here, its license, its website.
 const PROJECTS: &[(&str, &str, &str, &str)] = &[
-    ("WABT", "wasm2c: the game's code, to C", "Apache-2.0", "https://github.com/WebAssembly/wabt"),
-    ("wgpu", "Graphics on Metal and Vulkan", "MIT / Apache-2.0", "https://wgpu.rs"),
-    ("naga", "The game's shaders, translated", "MIT / Apache-2.0", "https://github.com/gfx-rs/wgpu"),
-    ("SDL", "Window, input, sound, gamepads", "Zlib", "https://libsdl.org"),
+    ("WABT", "wasm2c：游戏代码转 C", "Apache-2.0", "https://github.com/WebAssembly/wabt"),
+    ("wgpu", "Metal 与 Vulkan 图形", "MIT / Apache-2.0", "https://wgpu.rs"),
+    ("naga", "游戏着色器转译", "MIT / Apache-2.0", "https://github.com/gfx-rs/wgpu"),
+    ("SDL", "窗口、输入、声音、手柄", "Zlib", "https://libsdl.org"),
     ("sdl3-rs", "SDL from Rust", "MIT", "https://github.com/vhspace/sdl3-rs"),
-    ("egui", "This interface", "MIT / Apache-2.0", "https://github.com/emilk/egui"),
-    ("Barlow", "Typeface, by Jeremy Tribby", "SIL OFL 1.1", "https://github.com/jpt/barlow"),
+    ("egui", "本界面", "MIT / Apache-2.0", "https://github.com/emilk/egui"),
+    ("Barlow", "字体，Jeremy Tribby 设计", "SIL OFL 1.1", "https://github.com/jpt/barlow"),
     (
         "game-icons.net",
-        "Touch icons, by Lorc, Delapouite, John Colburn and Guard13007",
+        "触屏图标，Lorc、Delapouite、John Colburn 与 Guard13007 设计",
         "CC BY 3.0",
         "https://game-icons.net",
     ),
-    ("Phosphor Icons", "Touch icons", "MIT", "https://phosphoricons.com"),
-    ("Font Awesome Free", "Touch icons", "CC BY 4.0", "https://fontawesome.com"),
-    ("Material Symbols", "Touch icons, by Google", "Apache-2.0", "https://fonts.google.com/icons"),
-    ("Lucide", "Touch icons", "ISC", "https://lucide.dev"),
-    ("Tabler Icons", "Touch icons", "MIT", "https://tabler.io/icons"),
-    ("MingCute", "Touch icons", "Apache-2.0", "https://www.mingcute.com"),
-    ("etcpak", "Textures for GPUs without BC", "BSD-3-Clause", "https://github.com/wolfpld/etcpak"),
-    ("bcdec_rs", "Texture decoding", "MIT", "https://github.com/ScanMountGoat/image_dds"),
-    ("snow", "The Noise protocol: friends' encrypted channel", "Apache-2.0 / MIT", "https://github.com/mcginty/snow"),
-    ("Zstandard", "The game's small files, packed to stream", "BSD-3-Clause", "https://facebook.github.io/zstd"),
+    ("Phosphor Icons", "触屏图标", "MIT", "https://phosphoricons.com"),
+    ("Font Awesome Free", "触屏图标", "CC BY 4.0", "https://fontawesome.com"),
+    ("Material Symbols", "触屏图标，Google 出品", "Apache-2.0", "https://fonts.google.com/icons"),
+    ("Lucide", "触屏图标", "ISC", "https://lucide.dev"),
+    ("Tabler Icons", "触屏图标", "MIT", "https://tabler.io/icons"),
+    ("MingCute", "触屏图标", "Apache-2.0", "https://www.mingcute.com"),
+    ("etcpak", "供无 BC 支持 GPU 使用的纹理", "BSD-3-Clause", "https://github.com/wolfpld/etcpak"),
+    ("bcdec_rs", "纹理解码", "MIT", "https://github.com/ScanMountGoat/image_dds"),
+    ("snow", "Noise 协议：好友加密信道", "Apache-2.0 / MIT", "https://github.com/mcginty/snow"),
+    ("Zstandard", "游戏小文件已打包供串流", "BSD-3-Clause", "https://facebook.github.io/zstd"),
     #[cfg(target_os = "android")]
     (
         "libadrenotools",
-        "GPU drivers added for Adreno GPUs, with liblinkernsbypass, by Billy Laws",
+        "为 Adreno GPU 添加的驱动，含 liblinkernsbypass，Billy Laws 出品",
         "BSD-2-Clause",
         "https://github.com/bylaws/libadrenotools",
     ),
     #[cfg(target_vendor = "apple")]
-    ("objc2", "Apple's frameworks from Rust", "MIT", "https://github.com/madsmtm/objc2"),
+    ("objc2", "Apple 框架的 Rust 绑定", "MIT", "https://github.com/madsmtm/objc2"),
     #[cfg(windows)]
-    ("mimalloc", "Memory allocator", "MIT", "https://github.com/microsoft/mimalloc"),
-    ("Rust", "The language, its compiler and library", "MIT / Apache-2.0", "https://www.rust-lang.org"),
+    ("mimalloc", "内存分配器", "MIT", "https://github.com/microsoft/mimalloc"),
+    ("Rust", "语言、编译器与标准库", "MIT / Apache-2.0", "https://www.rust-lang.org"),
 ];
 
 /// True when closed.
@@ -76,10 +76,10 @@ pub(super) fn credits_page(ctx: &egui::Context) -> bool {
              it runs your own copy.",
         );
         ui.add_space(4.0 * scale);
-        ui.label(theme::heading("OPEN SOURCE", 17.0 * scale).color(theme::MUTED));
+        ui.label(theme::heading("开源项目", 17.0 * scale).color(theme::MUTED));
         for &(name, what, license, url) in PROJECTS {
             setting(ui, name, Control::Action, Some(&format!("{what} · {license}")), |ui| {
-                if action_button(ui, "Website").on_hover_text(url).clicked() {
+                if action_button(ui, "网站").on_hover_text(url).clicked() {
                     ui.ctx().open_url(egui::OpenUrl::new_tab(url));
                 }
             });

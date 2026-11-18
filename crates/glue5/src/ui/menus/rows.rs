@@ -170,7 +170,7 @@ pub(super) fn row(ui: &mut Ui, item: &MenuItem, draft: &mut Option<Draft>, landi
             let names: Vec<&str> =
                 selected.iter().filter_map(|&i| options.get(usize::from(i)).map(String::as_str)).collect();
             let summary = match names.len() {
-                0 => "None".to_owned(),
+                0 => "无".to_owned(),
                 1 | 2 => names.join(", "),
                 n => format!("{} +{}", names[..2].join(", "), n - 2),
             };

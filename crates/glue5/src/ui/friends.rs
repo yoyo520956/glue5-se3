@@ -40,13 +40,13 @@ pub fn toast(notice: &Notice) -> Toast {
                 (o, r) => format!("{o} Online · {r} Request(s)"),
             };
             let tab = if *requests > 0 { Tab::Requests } else { Tab::Friends };
-            Toast { title: "Friends", name: String::new(), text, tab }
+            Toast { title: "好友", name: String::new(), text, tab }
         }
-        Notice::Online(name) => toast("Friend Online", name, "Is now online.", Tab::Friends),
-        Notice::Offline(name) => toast("Friend Offline", name, "Has gone offline.", Tab::Friends),
-        Notice::Request(name) => toast("Friend Request", name, "Wants to be your friend.", Tab::Requests),
-        Notice::Accepted(name) => toast("Friend Request", name, "Accepted your friend request.", Tab::Friends),
-        Notice::Invite(name) => toast("Multiplayer Invite", name, "Sent you a multiplayer invite.", Tab::Invites),
+        Notice::Online(name) => toast("好友上线", name, "已上线。", Tab::Friends),
+        Notice::Offline(name) => toast("好友离线", name, "已下线。", Tab::Friends),
+        Notice::Request(name) => toast("好友请求", name, "想加你为好友。", Tab::Requests),
+        Notice::Accepted(name) => toast("好友请求", name, "接受了你的好友请求。", Tab::Friends),
+        Notice::Invite(name) => toast("多人邀请", name, "邀请你多人游戏。", Tab::Invites),
     }
 }
 
@@ -153,7 +153,7 @@ fn friends_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage, g
     let online = snapshot.friends.iter().filter(|f| f.playing.is_some()).count();
     heading(ui, &format!("ONLINE {online} OF {}", snapshot.friends.len()));
     if snapshot.friends.is_empty() {
-        muted(ui, "No friends yet. Find Players: the players you meet in sessions, or a friend's code.");
+        muted(ui, "还没有好友。查看“玩家”：在战局中遇见的玩家，或好友码。");
     }
     for f in &snapshot.friends {
         friend_row(ui, f, page, game, actions);
@@ -169,13 +169,13 @@ fn friends_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage, g
 
 fn friend_row(ui: &mut egui::Ui, f: &FriendInfo, page: &mut FriendsPage, game: &Context, actions: &mut Vec<Action>) {
     let status = match (f.playing, f.kind) {
-        (None, _) => "Offline",
-        (Some(Playing::Menu), _) => "Online",
-        (Some(Playing::Story), _) => "Playing Grand Theft Auto V, Story Mode",
-        (Some(Playing::Online), Some(SessionKind::Friends)) => "Playing GTA Online, Closed Friend Session",
-        (Some(Playing::Online), Some(SessionKind::Closed)) => "Playing GTA Online, Invite Only Session",
-        (Some(Playing::Online), Some(SessionKind::Solo)) => "Playing GTA Online, Solo Session",
-        (Some(Playing::Online), _) => "Playing GTA Online, Public Session",
+        (None, _) => "离线",
+        (Some(Playing::Menu), _) => "在线",
+        (Some(Playing::Story), _) => "正在游玩 Grand Theft Auto V · 故事模式",
+        (Some(Playing::Online), Some(SessionKind::Friends)) => "正在游玩 GTA Online · 好友战局",
+        (Some(Playing::Online), Some(SessionKind::Closed)) => "正在游玩 GTA Online · 仅限邀请战局",
+        (Some(Playing::Online), Some(SessionKind::Solo)) => "正在游玩 GTA Online · 单人战局",
+        (Some(Playing::Online), _) => "正在游玩 GTA Online · 公开战局",
     };
     // The font has no round dot: its bullet.
     let dot = if f.playing.is_some() { "• " } else { "" };
@@ -189,10 +189,10 @@ fn friend_row(ui: &mut egui::Ui, f: &FriendInfo, page: &mut FriendsPage, game: &
             // A phone's row has room for short words.
             let short = ui.available_width() < 250.0 * theme::density(ui);
             let mut labels = vec![if sure { "Remove?" } else { "🗙" }];
-            labels.extend(can_join.then_some(if short { "Join" } else { "Join game" }));
-            labels.extend(can_invite.then_some(if short { "Invite" } else { "Invite to game" }));
+            labels.extend(can_join.then_some(if short { "加入" } else { "加入游戏" }));
+            labels.extend(can_invite.then_some(if short { "邀请" } else { "邀请加入游戏" }));
             let mut buttons = action_buttons(ui, &labels).into_iter();
-            if buttons.next().is_some_and(|b| b.on_hover_text("Remove friend").clicked()) {
+            if buttons.next().is_some_and(|b| b.on_hover_text("删除好友").clicked()) {
                 if sure {
                     friends::remove(&f.key);
                     page.message = Some((format!("{} removed from your friends.", f.name), false));
@@ -214,14 +214,14 @@ fn friend_row(ui: &mut egui::Ui, f: &FriendInfo, page: &mut FriendsPage, game: &
 }
 
 fn requests_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage) {
-    heading(ui, "FRIEND REQUESTS");
+    heading(ui, "好友请求");
     if snapshot.requests.is_empty() {
-        muted(ui, "No pending friend requests.");
+        muted(ui, "没有待处理的好友请求。");
     }
     for (key, name) in &snapshot.requests {
         ui.push_id(key, |ui| {
-            setting(ui, name, Control::Actions, Some("Wants to be your friend."), |ui| {
-                let [decline, accept] = <[_; 2]>::try_from(action_buttons(ui, &["Decline", "Accept"])).unwrap();
+            setting(ui, name, Control::Actions, Some("想加你为好友。"), |ui| {
+                let [decline, accept] = <[_; 2]>::try_from(action_buttons(ui, &["拒绝", "接受"])).unwrap();
                 if decline.clicked() {
                     friends::answer(key, false);
                     page.message = Some((format!("Friend request from {name} declined."), false));
@@ -237,13 +237,13 @@ fn requests_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage) 
         heading(ui, "SENT");
         for a in &snapshot.asked {
             let state = match (a.declined, a.reached) {
-                (true, _) => "Declined",
-                (false, true) => "Friend Request Pending",
-                (false, false) => "Looking for them: they need Glue 5 open",
+                (true, _) => "已拒绝",
+                (false, true) => "好友请求待处理",
+                (false, false) => "正在寻找：对方需要打开 Glue 5",
             };
             ui.push_id(&a.id, |ui| {
                 setting(ui, &a.label, Control::Action, Some(state), |ui| {
-                    if action_button(ui, if a.declined { "Dismiss" } else { "Cancel" }).clicked() {
+                    if action_button(ui, if a.declined { "忽略" } else { "取消" }).clicked() {
                         friends::cancel(&a.id);
                     }
                 });
@@ -254,17 +254,17 @@ fn requests_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage) 
 
 fn invites_tab(ui: &mut egui::Ui, snapshot: &Snapshot, game: &Context, actions: &mut Vec<Action>) {
     let invites: Vec<&FriendInfo> = snapshot.friends.iter().filter(|f| f.invited).collect();
-    heading(ui, "GAME INVITES");
+    heading(ui, "游戏邀请");
     if invites.is_empty() {
-        muted(ui, "No pending game invites.");
+        muted(ui, "没有待处理的游戏邀请。");
     }
     for f in invites {
         ui.push_id(("invite", &f.key), |ui| {
-            setting(ui, &f.name, Control::Actions, Some("Sent you a multiplayer invite."), |ui| {
+            setting(ui, &f.name, Control::Actions, Some("邀请你多人游戏。"), |ui| {
                 // Accepted from the start page or a game that reaches GTA
                 // Online (not the benchmark).
                 let can_accept = !game.started || game.online;
-                let labels: &[&str] = if can_accept { &["Decline", "Accept"] } else { &["Decline"] };
+                let labels: &[&str] = if can_accept { &["拒绝", "接受"] } else { &["拒绝"] };
                 let buttons = action_buttons(ui, labels);
                 if buttons[0].clicked() {
                     friends::ignore_invite(&f.key);
@@ -278,27 +278,27 @@ fn invites_tab(ui: &mut egui::Ui, snapshot: &Snapshot, game: &Context, actions: 
 }
 
 fn find_tab(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage) {
-    heading(ui, "PLAYERS YOU MET");
+    heading(ui, "遇见过的玩家");
     if snapshot.recent.is_empty() {
-        muted(ui, "The players you meet in GTA Online's sessions show here: send them a friend request.");
+        muted(ui, "在 GTA Online 战局中遇见的玩家会显示在这里：向他们发送好友请求。");
     }
     for r in snapshot.recent.iter().take(30) {
         let state = match (r.asked, r.here) {
-            (true, _) => "Friend Request Pending",
-            (false, true) => "In your session",
-            (false, false) => "Played with you",
+            (true, _) => "好友请求待处理",
+            (false, true) => "在你的战局中",
+            (false, false) => "曾与你同玩",
         };
         ui.push_id(("recent", &r.key), |ui| {
             setting(ui, &r.name, Control::Action, Some(state), |ui| {
                 // Asked while it plays in one of this player's lobbies.
-                if !r.asked && r.here && action_button(ui, "Send friend request").clicked() {
+                if !r.asked && r.here && action_button(ui, "发送好友请求").clicked() {
                     friends::ask_player(&r.key);
                     page.message = Some((format!("Friend Request Sent to {}", r.name), false));
                 }
             });
         });
     }
-    heading(ui, "FRIEND CODE");
+    heading(ui, "好友码");
     your_code(ui, snapshot, page);
     ask(ui, page);
 }
@@ -316,16 +316,16 @@ fn join(f: &FriendInfo, game: &Context, actions: &mut Vec<Action>) {
 
 fn your_code(ui: &mut egui::Ui, snapshot: &Snapshot, page: &mut FriendsPage) {
     let code = snapshot.code.clone().or_else(friends::my_code).unwrap_or_default();
-    let what = "Your friend code: with it a player can send you a friend request";
+    let what = "你的好友码：其他玩家用它向你发送好友请求";
     setting(ui, &code, Control::Actions, Some(what), |ui| {
-        let [new, copy] = <[_; 2]>::try_from(action_buttons(ui, &["New", "Copy"])).unwrap();
-        if new.on_hover_text("A new code: the old one stops working").clicked() {
+        let [new, copy] = <[_; 2]>::try_from(action_buttons(ui, &["新", "复制"])).unwrap();
+        if new.on_hover_text("新代码：旧代码将失效").clicked() {
             friends::new_code();
-            page.message = Some(("A new code: the old one no longer reaches you.".into(), false));
+            page.message = Some(("新代码：旧代码将无法再联系到你。".into(), false));
         }
         if copy.clicked() {
             ui.ctx().copy_text(code.clone());
-            page.message = Some(("Code copied.".into(), false));
+            page.message = Some(("代码已复制。".into(), false));
         }
     });
 }
@@ -337,11 +337,11 @@ fn ask(ui: &mut egui::Ui, page: &mut FriendsPage) {
         let field = ui.available_width() - button - ui.spacing().item_spacing.x;
         let typed = ui
             .allocate_ui(egui::vec2(field, 44.0 * scale), |ui| {
-                text_field(ui, "Code", TextKind::Code, &mut page.code, "A friend's code", 24)
+                text_field(ui, "代码", TextKind::Code, &mut page.code, "好友的代码", 24)
             })
             .inner;
         let enter = typed.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
-        let send = egui::Button::new(RichText::new("Send").size(14.0 * scale))
+        let send = egui::Button::new(RichText::new("发送").size(14.0 * scale))
             .corner_radius((12.0 * scale) as u8)
             .min_size(egui::vec2(button, 44.0 * scale));
         let sent = focus(ui.add_enabled(!page.code.trim().is_empty(), send));
@@ -349,11 +349,11 @@ fn ask(ui: &mut egui::Ui, page: &mut FriendsPage) {
             page.message = Some(match friends::ask(&page.code) {
                 Ok(()) => {
                     page.code.clear();
-                    ("Friend Request Sent: they will see it once they open Glue 5.".into(), false)
+                    ("好友请求已发送：对方打开 Glue 5 后即可看到。".into(), false)
                 }
-                Err(AddError::Invalid) => ("That is not a friend code: check it again.".into(), true),
-                Err(AddError::Own) => ("That is your own code.".into(), true),
-                Err(AddError::Asked) => ("A friend request is already pending.".into(), true),
+                Err(AddError::Invalid) => ("这不是好友码：请再检查一次。".into(), true),
+                Err(AddError::Own) => ("那是你自己的代码。".into(), true),
+                Err(AddError::Asked) => ("已有待处理的好友请求。".into(), true),
             });
         }
     });

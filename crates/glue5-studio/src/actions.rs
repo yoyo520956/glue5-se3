@@ -32,7 +32,7 @@ pub(crate) fn close_mod(s: S, name: &str) {
 
 /// A new mod, asked for by name; its main.luau opens.
 pub(crate) fn new_mod(s: S) {
-    let Some(name) = web_sys::window().and_then(|w| w.prompt_with_message("New mod's name (lowercase, digits, - and _):").ok().flatten()) else { return };
+    let Some(name) = web_sys::window().and_then(|w| w.prompt_with_message("新模组名称（小写字母、数字、- 和 _）：").ok().flatten()) else { return };
     let name = name.trim().to_lowercase();
     if name.is_empty() {
         return;
@@ -51,7 +51,7 @@ pub(crate) fn new_mod(s: S) {
 /// for by name (`core/prefs.luau` makes it in a folder), then opened.
 pub(crate) fn new_file(s: S, name: &str) {
     let Some(file) = web_sys::window()
-        .and_then(|w| w.prompt_with_message_and_default("New file's name (in a folder: folder/name.luau):", "module.luau").ok().flatten())
+        .and_then(|w| w.prompt_with_message_and_default("新文件名称（在文件夹中：folder/name.luau）：", "module.luau").ok().flatten())
     else {
         return;
     };
@@ -70,7 +70,7 @@ pub(crate) fn new_file(s: S, name: &str) {
 /// name; its tabs follow.
 pub(crate) fn rename_file(s: S, path: &str) {
     let Some((name, file)) = path.split_once('/') else { return };
-    let Some(new) = web_sys::window().and_then(|w| w.prompt_with_message_and_default("Rename or move to (folder/name moves it):", file).ok().flatten()) else {
+    let Some(new) = web_sys::window().and_then(|w| w.prompt_with_message_and_default("重命名或移动到（folder/name 表示移动）：", file).ok().flatten()) else {
         return;
     };
     let new = new.trim().to_string();
@@ -152,7 +152,7 @@ pub(crate) fn delete_file(s: S, path: &str, folder: bool) {
 /// A new folder in `name` (a mod or one of its folders), with a first file
 /// in it: folders hold files.
 pub(crate) fn new_folder(s: S, name: &str) {
-    let Some(folder) = web_sys::window().and_then(|w| w.prompt_with_message("New folder's name:").ok().flatten()) else {
+    let Some(folder) = web_sys::window().and_then(|w| w.prompt_with_message("新文件夹名称：").ok().flatten()) else {
         return;
     };
     let folder = folder.trim().trim_matches('/').to_string();
@@ -259,7 +259,7 @@ pub(crate) fn close_tab(s: S, path: &str) {
 pub(crate) fn insert_code(s: S, code: &str) {
     let writable = active_file(s).filter(|p| s.tabs.with_untracked(|t| t.iter().any(|t| &t.path == p && !t.read_only)));
     if writable.is_none() {
-        s.notice.set(Some("Open one of the mod's files first: it goes in at the cursor".into()));
+        s.notice.set(Some("请先打开该模组的一个文件：内容将插入光标处".into()));
         return;
     }
     s.screen.set(Screen::Editor);

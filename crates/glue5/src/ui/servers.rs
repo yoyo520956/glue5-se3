@@ -66,8 +66,8 @@ fn in_use(ui: &mut egui::Ui, settings: &Settings, status: &Status) {
     let server = settings.server.trim();
     panel(ui, |ui| {
         if server.is_empty() {
-            card_title(ui, "No server yet", Some(("Not chosen", WARN)));
-            small(ui, "Choose a computer on this network, or type its address.", theme::MUTED);
+            card_title(ui, "还没有服务器", Some(("未选择", WARN)));
+            small(ui, "选择本网络中的电脑，或输入其地址。", theme::MUTED);
             return;
         }
         let stream = status.stream.filter(|(s, _)| *s == server).map(|(_, s)| s);
@@ -78,7 +78,7 @@ fn in_use(ui: &mut egui::Ui, settings: &Settings, status: &Status) {
         }
         match stream {
             _ if settings.source != Source::Server => {
-                small(ui, "The game's files come from this device's folder (Settings › Game › Game files).", WARN)
+                small(ui, "游戏文件来自本机文件夹（设置 › 游戏 › 游戏文件）。", WARN)
             }
             Some(s) => {
                 if s.cache_bytes > 0 {
@@ -95,7 +95,7 @@ fn in_use(ui: &mut egui::Ui, settings: &Settings, status: &Status) {
 
 /// The computers sharing the game on this network, searched all the while.
 fn network(ui: &mut egui::Ui, settings: &Settings, status: &Status, actions: &mut Vec<Action>) {
-    section(ui, "ON THIS NETWORK", scanning);
+    section(ui, "本网络", scanning);
     let current = settings.server.trim();
     for server in status.servers {
         let (found, check) = server;
@@ -111,8 +111,8 @@ fn network(ui: &mut egui::Ui, settings: &Settings, status: &Status, actions: &mu
         ui.push_id(&found.address, |ui| {
             setting(ui, &found.name, Control::Action, Some(&what), |ui| {
                 if using {
-                    ui.add_enabled_ui(false, |ui| action_button(ui, "In use"));
-                } else if ui.add_enabled_ui(usable, |ui| action_button(ui, "Use")).inner.clicked() {
+                    ui.add_enabled_ui(false, |ui| action_button(ui, "使用中"));
+                } else if ui.add_enabled_ui(usable, |ui| action_button(ui, "使用")).inner.clicked() {
                     actions.push(Action::UseServer(found.address.clone()));
                 }
             });
@@ -125,7 +125,7 @@ fn network(ui: &mut egui::Ui, settings: &Settings, status: &Status, actions: &mu
              the network, or glue5-serve; both on the same network.",
         );
         if cfg!(target_os = "ios") {
-            muted(ui, "None shows up: allow Glue 5 in Settings › Privacy & Security › Local Network.");
+            muted(ui, "一个都没有：请在 设置 › 隐私与安全性 › 本地网络 中允许 Glue 5。");
         }
     }
 }
@@ -148,7 +148,7 @@ fn scanning(ui: &mut egui::Ui) {
 /// A server by its address: typed, then Connect (or Enter).
 fn by_address(ui: &mut egui::Ui, page: &mut ServersPage, actions: &mut Vec<Action>) {
     let scale = theme::density(ui);
-    section(ui, "BY ADDRESS", |_| {});
+    section(ui, "按地址", |_| {});
     ui.horizontal(|ui| {
         let button = 104.0 * scale;
         let field = ui.available_width() - button - ui.spacing().item_spacing.x;
@@ -159,7 +159,7 @@ fn by_address(ui: &mut egui::Ui, page: &mut ServersPage, actions: &mut Vec<Actio
             .inner;
         let enter = typed.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
         let ready = !page.address.trim().is_empty();
-        let connect = egui::Button::new(RichText::new("Connect").size(14.0 * scale))
+        let connect = egui::Button::new(RichText::new("连接").size(14.0 * scale))
             .corner_radius((12.0 * scale) as u8)
             .min_size(vec2(button, 44.0 * scale));
         let clicked = focus(ui.add_enabled(ready, connect)).clicked();
@@ -168,7 +168,7 @@ fn by_address(ui: &mut egui::Ui, page: &mut ServersPage, actions: &mut Vec<Actio
             page.address.clear();
         }
     });
-    muted(ui, "For a server the search does not reach (another network, a VPN); port 47100 unless another is given.");
+    muted(ui, "用于搜索无法到达的服务器（其他网络、VPN）；端口默认为 47100，除非另有指定。");
 }
 
 /// What this device keeps: the whole game or what was read, and deleting it.
@@ -179,31 +179,31 @@ fn this_device(
     status: &Status,
     actions: &mut Vec<Action>,
 ) {
-    section(ui, "ON THIS DEVICE", |_| {});
+    section(ui, "本机", |_| {});
     let stream = status.stream.map(|(_, s)| s);
     if paths::can_download_all() {
         let mut shown = match stream {
-            Some(s) if s.complete => "All here: plays without the server".to_owned(),
+            Some(s) if s.complete => "全部在本机：无需服务器即可游玩".to_owned(),
             Some(s) if s.no_room => format!("Waiting for space: {} of {}", bytes(s.cache_bytes), bytes(s.total_bytes)),
             Some(s) if s.filling => format!("{} of {}", bytes(s.cache_bytes), bytes(s.total_bytes)),
             Some(s) if s.total_bytes > 0 => format!("{}, to play without the server", bytes(s.total_bytes)),
-            _ => "To play without the server".to_owned(),
+            _ => "以便无需服务器游玩".to_owned(),
         };
         // The stream follows the setting when the game no longer runs on it.
         if status.started.is_some() && stream.is_some_and(|s| (s.filling || s.complete) != settings.download_all) {
             shown.push_str(" · next start");
         }
-        setting(ui, "Download the whole game", Control::Toggle, Some(&shown), |ui| toggle(ui, &mut settings.download_all))
-            .on_hover_text("At the lowest priority: the game's own reads go first");
+        setting(ui, "下载完整游戏", Control::Toggle, Some(&shown), |ui| toggle(ui, &mut settings.download_all))
+            .on_hover_text("最低优先级：游戏自身的读取优先");
     }
     let copy = stream.map_or(0, |s| s.cache_bytes);
     let what = match copy {
-        0 => "Nothing yet".to_owned(),
+        0 => "还没有".to_owned(),
         n if stream.is_some_and(|s| s.complete) => format!("{}: the whole game", bytes(n)),
         n => format!("{}, kept for the next starts", bytes(n)),
     };
     page.deleting &= copy > 0 && status.started.is_none();
-    setting(ui, "Copy on this device", Control::Action, Some(&what), |ui| {
+    setting(ui, "本机副本", Control::Action, Some(&what), |ui| {
         ui.add_enabled_ui(status.started.is_none() && copy > 0, |ui| {
             if action_button(ui, if page.deleting { "Sure?" } else { "Delete" }).clicked() {
                 if page.deleting {
@@ -214,7 +214,7 @@ fn this_device(
         })
         .response
     })
-    .on_hover_text("What came from the server; it is taken again when needed");
+    .on_hover_text("来自服务器的内容；需要时会重新获取");
 }
 
 /// A section's title, and on its right what `right` adds (a button).

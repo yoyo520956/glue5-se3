@@ -81,12 +81,12 @@ pub(super) fn page(
         _ => to_hsv(value),
     };
     let before = current;
-    setting(ui, "Hue", Control::Slider, None, |ui| slider(ui, &mut current[0], 0.0..=360.0, 1.0, "°", 0));
-    setting(ui, "Saturation", Control::Slider, None, |ui| slider(ui, &mut current[1], 0.0..=1.0, 0.01, "%", 0));
-    setting(ui, "Brightness", Control::Slider, None, |ui| slider(ui, &mut current[2], 0.0..=1.0, 0.01, "%", 0));
+    setting(ui, "色相", Control::Slider, None, |ui| slider(ui, &mut current[0], 0.0..=360.0, 1.0, "°", 0));
+    setting(ui, "饱和度", Control::Slider, None, |ui| slider(ui, &mut current[1], 0.0..=1.0, 0.01, "%", 0));
+    setting(ui, "亮度", Control::Slider, None, |ui| slider(ui, &mut current[2], 0.0..=1.0, 0.01, "%", 0));
     let mut opacity = f32::from(value.a) / 255.0;
     if alpha
-        && setting(ui, "Opacity", Control::Slider, None, |ui| slider(ui, &mut opacity, 0.0..=1.0, 0.01, "%", 0))
+        && setting(ui, "不透明度", Control::Slider, None, |ui| slider(ui, &mut opacity, 0.0..=1.0, 0.01, "%", 0))
             .changed()
     {
         sent = Some(Rgba { a: (opacity * 255.0).round() as u8, ..value });

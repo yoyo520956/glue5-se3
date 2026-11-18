@@ -42,7 +42,7 @@ pub(crate) fn Tabs(s: S) -> impl IntoView {
                         {if read_only { view! { <span class="ico lock" inner_html=icons::LOCK></span> }.into_any() }
                          else if t.dirty { view! { <span class="unsaved"></span> }.into_any() }
                          else { ().into_any() }}
-                        <button class="x" aria-label="Close" title="Close" on:click=move |ev| { ev.stop_propagation(); close_tab(s, &p3); }>"×"</button>
+                        <button class="x" aria-label="关闭" title="关闭" on:click=move |ev| { ev.stop_propagation(); close_tab(s, &p3); }>"×"</button>
                     </div>
                 }
             }).collect_view()}
@@ -80,21 +80,21 @@ pub(crate) fn Toolbar(s: S) -> impl IntoView {
                 view! {
                     <div class="runstate">
                         <span class=state_class(&m)></span>
-                        <b>{match m.state.as_str() { "running" if m.waiting => "Waiting", "running" => "Running", "error" => "Error", _ => "Stopped" }}</b>
+                        <b>{match m.state.as_str() { "running" if m.waiting => "等待中", "running" => "运行中", "error" => "错误", _ => "已停止" }}</b>
                     </div>
                     {running.then(|| view! {
                         <button class="btn" on:click=move |_| request("mods.restart", json!({"name": name}), |_| {})>
-                            <span class="ico small" inner_html=icons::RESTART></span>"Restart"
+                            <span class="ico small" inner_html=icons::RESTART></span>"重启"
                         </button>
                     })}
                     <button class="btn primary" on:click=toggle_run>
                         <span class="ico small" inner_html=if running { icons::STOP } else { icons::PLAY }></span>
-                        {if running { "Stop" } else { "Start" }}
+                        {if running { "停止" } else { "启动" }}
                     </button>
                 }
             })}
             <Show when=move || current().is_some()>
-                <button class="btn ghost" title="Save (Ctrl/Cmd+S)" on:click=move |_| if let Some(p) = current() { save(s, p) }>"Save"</button>
+                <button class="btn ghost" title="保存（Ctrl/Cmd+S）" on:click=move |_| if let Some(p) = current() { save(s, p) }>"保存"</button>
             </Show>
         </div>
     }
@@ -105,7 +105,7 @@ pub(crate) fn Toolbar(s: S) -> impl IntoView {
 pub(crate) fn Welcome(s: S) -> impl IntoView {
     let counts = move || {
         s.mods.with(|m| match (m.len(), m.iter().filter(|m| m.state == "running").count()) {
-            (0, _) => "No mods yet".to_string(),
+            (0, _) => "暂无模组".to_string(),
             (1, r) => format!("1 mod, {r} running"),
             (n, r) => format!("{n} mods, {r} running"),
         })
@@ -117,30 +117,30 @@ pub(crate) fn Welcome(s: S) -> impl IntoView {
                     <img src="/logo.png" alt=""/>
                     <div>
                         <h1>"GLUE 5 STUDIO"</h1>
-                        <p>"Mods are Luau scripts that run inside the game. Write one here: each save reloads it."</p>
+                        <p>"模组是在游戏内运行的 Luau 脚本。在此编写：每次保存都会重新加载。"</p>
                     </div>
                 </header>
                 <p class=move || if s.connected.get() { "welcome-status" } else { "welcome-status off" }>
                     <span class="dot"></span>
-                    {move || s.hello.with(|h| h["device"].as_str().unwrap_or("The game").to_string())}
+                    {move || s.hello.with(|h| h["device"].as_str().unwrap_or("游戏").to_string())}
                     <span class="sep">"·"</span>
                     {counts}
                 </p>
                 <div class="quick">
                     <button class="quick-card" on:click=move |_| new_mod(s)>
                         <span class="ico" inner_html=icons::PLUS></span>
-                        <b>"New mod"</b>
-                        <small>"A folder with its main.luau, ready to run."</small>
+                        <b>"新建模组"</b>
+                        <small>"含 main.luau 的文件夹，可直接运行。"</small>
                     </button>
                     <button class="quick-card" on:click=move |_| import(s)>
                         <span class="ico" inner_html=icons::IMPORT></span>
-                        <b>"Import a .zip"</b>
-                        <small>"A mod someone exported and shared."</small>
+                        <b>"导入 .zip"</b>
+                        <small>"他人导出并分享的模组。"</small>
                     </button>
                     <a class="quick-card" href="/control" target="_blank" rel="noopener">
                         <span class="ico" inner_html=icons::SLIDERS></span>
-                        <b>"Control page"</b>
-                        <small>"The mods and their menus, for a phone or a second screen."</small>
+                        <b>"控制页"</b>
+                        <small>"模组及其菜单，供手机或第二屏使用。"</small>
                     </a>
                 </div>
                 <Agents/>

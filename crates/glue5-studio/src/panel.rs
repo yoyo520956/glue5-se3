@@ -20,12 +20,12 @@ pub(crate) fn BottomPanel(s: S) -> impl IntoView {
                 <div class="grow"></div>
                 <Show when=move || s.panel.get() == Panel::Console>
                     <div class="chips">
-                        <button class=move || if s.filter.get() == Filter::All { "chip on" } else { "chip" } on:click=move |_| s.filter.set(Filter::All)>"All"</button>
+                        <button class=move || if s.filter.get() == Filter::All { "chip on" } else { "chip" } on:click=move |_| s.filter.set(Filter::All)>"全部"</button>
                         <button class=move || if s.filter.get() == Filter::Current { "chip on" } else { "chip" } on:click=move |_| s.filter.set(Filter::Current)>
-                            {move || s.active.get().filter(|p| p.contains('/')).map(|p| mod_of(&p).to_string()).unwrap_or_else(|| "This mod".into())}
+                            {move || s.active.get().filter(|p| p.contains('/')).map(|p| mod_of(&p).to_string()).unwrap_or_else(|| "此模组".into())}
                         </button>
-                        <button class=move || if s.filter.get() == Filter::Errors { "chip on" } else { "chip" } on:click=move |_| s.filter.set(Filter::Errors)>"Errors"</button>
-                        <button class="chip" title="Clear" on:click=move |_| s.rows.set(Vec::new())>"Clear"</button>
+                        <button class=move || if s.filter.get() == Filter::Errors { "chip on" } else { "chip" } on:click=move |_| s.filter.set(Filter::Errors)>"错误"</button>
+                        <button class="chip" title="清除" on:click=move |_| s.rows.set(Vec::new())>"清除"</button>
                     </div>
                 </Show>
             </div>
@@ -149,7 +149,7 @@ pub(crate) fn Problems(s: S) -> impl IntoView {
             {move || {
                 let l = list();
                 if l.is_empty() {
-                    return view! { <p class="empty">"No problems in the open files."</p> }.into_any();
+                    return view! { <p class="empty">"打开的文件没有问题。"</p> }.into_any();
                 }
                 l.into_iter().map(|(path, d)| {
                     let (p, line, col) = (path.clone(), d.line, d.column);

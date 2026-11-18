@@ -15,21 +15,21 @@ use egui::{Align, Align2, Color32, Id, Layout, Rect, RichText, Sense, Stroke, St
 /// The only platform differences are capabilities, not layout.
 fn open_hint() -> &'static str {
     if TOUCH {
-        "Settings: ⚙ or Back + Start"
+        "设置：⚙ 或 Back + Start"
     } else if TV {
-        "Settings: Back + Start"
+        "设置：Back + Start"
     } else {
-        "Settings: F1 or Back + Start"
+        "设置：F1 或 Back + Start"
     }
 }
 
 /// The ways into the game, the start page's main column: a name and what
 /// it is.
 const MODES: [(Mode, &str, &str); 4] = [
-    (Mode::Story, "STORY MODE", "Michael, Franklin and Trevor's story, from your saves."),
-    (Mode::Online, "GTA ONLINE", "Freemode with other players, matched automatically, no servers."),
-    (Mode::Sandbox, "SANDBOX", "The whole map, free roam, no missions."),
-    (Mode::Benchmark, "BENCHMARK", "The game's fly-through of the map: how it runs here."),
+    (Mode::Story, "故事模式", "麦克、富兰克林和崔佛的故事，从你的存档继续。"),
+    (Mode::Online, "GTA ONLINE", "与其他玩家自由模式，自动匹配，无需服务器。"),
+    (Mode::Sandbox, "SANDBOX", "整张地图，自由漫游，无任务。"),
+    (Mode::Benchmark, "BENCHMARK", "游戏的地图飞行演示：看看它在这里跑得怎样。"),
 ];
 
 /// A mode's card at least, and the title's row, in points at full density
@@ -119,15 +119,15 @@ pub(super) fn start_page(
             let labels = width >= 720.0 * scale;
             ui.scope_builder(UiBuilder::new().max_rect(title_row).layout(Layout::right_to_left(Align::Center)), |ui| {
                 ui.spacing_mut().item_spacing.x = 8.0 * scale;
-                if !MOBILE && icon_button(ui, "🗙", "Quit", labels).clicked() {
+                if !MOBILE && icon_button(ui, "🗙", "退出", labels).clicked() {
                     actions.push(Action::Quit);
                 }
                 // Streamed (always, on the Apple TV), the files come from the
                 // Servers page.
                 let (icon, files) = match status.source {
-                    Source::Server => ("🖧", "Server"),
-                    Source::Folder if MOBILE => ("🗁", "Find files"),
-                    Source::Folder => ("🗁", "Game folder"),
+                    Source::Server => ("🖧", "服务器"),
+                    Source::Folder if MOBILE => ("🗁", "查找文件"),
+                    Source::Folder => ("🗁", "游戏文件夹"),
                 };
                 if icon_button(ui, icon, files, labels).clicked() {
                     match status.source {
@@ -135,21 +135,21 @@ pub(super) fn start_page(
                         Source::Folder => actions.push(if MOBILE { Action::FindGame } else { Action::ChooseGame }),
                     }
                 }
-                if icon_button(ui, "★", "Credits", labels).clicked() {
+                if icon_button(ui, "★", "制作名单", labels).clicked() {
                     *go = Some(Some(Page::Credits));
                 }
-                if icon_button(ui, "🛠", "Mods", labels).clicked() {
+                if icon_button(ui, "🛠", "模组", labels).clicked() {
                     *go = Some(Some(Page::Mods));
                 }
                 // Asked to be friends: how many, on the button.
                 let friends = match status.friend_requests {
-                    0 => "Friends".to_owned(),
+                    0 => "好友".to_owned(),
                     n => format!("Friends ({n})"),
                 };
                 if icon_button(ui, "♡", &friends, labels || status.friend_requests > 0).clicked() {
                     *go = Some(Some(Page::Friends));
                 }
-                if icon_button(ui, "⚙", "Settings", labels).clicked() {
+                if icon_button(ui, "⚙", "设置", labels).clicked() {
                     *go = Some(Some(Page::Settings));
                 }
             });
@@ -199,7 +199,7 @@ fn mode_list(
                     id,
                     width,
                     &format!("PREPARING {:.0}%", done * 100.0),
-                    "Compiling the game's shaders for this device: minutes the first time, seconds after.",
+                    "正在为本机编译游戏着色器：首次需数分钟，之后只需数秒。",
                     look,
                     None,
                     Some(done),
@@ -365,7 +365,7 @@ fn online_card(
                         let what = "Sessions with the players online, matched automatically; invite-only, friend \
                                     and solo sessions from the game's pause menu, and your friends from ♡ Friends.";
                         ui.label(RichText::new(what).size(12.0 * scale).color(theme::MUTED));
-                        text_field(ui, "Name", TextKind::Name, &mut settings.online_name, "Player", 16);
+                        text_field(ui, "名称", TextKind::Name, &mut settings.online_name, "玩家", 16);
                         ui.add_space(2.0 * scale);
                         play = play_button(ui, "PLAY").clicked();
                     });
@@ -436,7 +436,7 @@ fn info(
     }
     if let Some(why) = status.drivers.and_then(|d| d.fallback.as_deref()) {
         card(ui, |ui| {
-            card_title(ui, "GPU DRIVER", Some(("Phone's", WARN)));
+            card_title(ui, "GPU 驱动", Some(("Phone's", WARN)));
             ui.label(RichText::new(why).small().color(theme::MUTED));
         });
     }
@@ -486,8 +486,8 @@ fn game_files(ui: &mut egui::Ui, settings: &mut Settings, status: &Status, go: &
     if status.source == Source::Server {
         return streamed_files(ui, status, go);
     }
-    let state = if status.game_dir.is_some() { ("Ready", READY) } else { ("Missing", WARN) };
-    card_title(ui, "GAME FILES", Some(state));
+    let state = if status.game_dir.is_some() { ("就绪", READY) } else { ("缺失", WARN) };
+    card_title(ui, "游戏文件", Some(state));
     if let Some(dir) = status.game_dir {
         let text = dir.display().to_string();
         ui.add(egui::Label::new(RichText::new(&text).small().color(theme::MUTED)).truncate()).on_hover_text(text);
@@ -498,7 +498,7 @@ fn game_files(ui: &mut egui::Ui, settings: &mut Settings, status: &Status, go: &
         ui.label(RichText::new(paths::where_the_game_goes()).small().color(theme::MUTED));
         ui.label(RichText::new(paths::game_layout()).monospace().small().color(theme::MUTED));
         ui.label(RichText::new(paths::or_stream()).small().color(theme::MUTED));
-        if ui.horizontal(|ui| action_button(ui, "Stream from a server")).inner.clicked() {
+        if ui.horizontal(|ui| action_button(ui, "从服务器串流")).inner.clicked() {
             settings.source = Source::Server;
             *go = Some(Some(Page::Servers));
         }
@@ -525,14 +525,14 @@ pub(super) fn bytes(n: u64) -> String {
 /// The game's files from a server: where from, how far.
 fn streamed_files(ui: &mut egui::Ui, status: &Status, go: &mut Option<Option<Page>>) {
     let Some((server, s)) = status.stream else {
-        card_title(ui, "GAME FILES", Some(("No server", WARN)));
-        small(ui, "Choose the computer that shares the game.", theme::MUTED);
-        if ui.horizontal(|ui| action_button(ui, "Choose a server")).inner.clicked() {
+        card_title(ui, "游戏文件", Some(("无服务器", WARN)));
+        small(ui, "选择共享游戏的电脑。", theme::MUTED);
+        if ui.horizontal(|ui| action_button(ui, "选择服务器")).inner.clicked() {
             *go = Some(Some(Page::Servers));
         }
         return;
     };
-    card_title(ui, "GAME FILES", Some(stream_state(s)));
+    card_title(ui, "游戏文件", Some(stream_state(s)));
     let mut from = format!("From {}", server_name(status, server));
     if s.cache_bytes > 0 {
         from.push_str(&format!(" · {} on this device", bytes(s.cache_bytes)));
@@ -544,11 +544,11 @@ fn streamed_files(ui: &mut egui::Ui, status: &Status, go: &mut Option<Option<Pag
 /// The stream's state in a word, for a card's pill.
 pub(super) fn stream_state(s: &glue5_stream::Status) -> (&'static str, Color32) {
     match &s.phase {
-        Phase::Failed(_) => ("Stopped", WARN),
-        Phase::Ready if !s.connected => ("Offline", WARN),
-        Phase::Ready => ("Ready", READY),
-        Phase::Syncing { .. } => ("Taking files", theme::MUTED),
-        Phase::Connecting => ("Connecting", WARN),
+        Phase::Failed(_) => ("已停止", WARN),
+        Phase::Ready if !s.connected => ("离线", WARN),
+        Phase::Ready => ("就绪", READY),
+        Phase::Syncing { .. } => ("正在取文件", theme::MUTED),
+        Phase::Connecting => ("连接中", WARN),
     }
 }
 
@@ -558,7 +558,7 @@ pub(super) fn stream_progress(ui: &mut egui::Ui, s: &glue5_stream::Status) {
         Phase::Failed(why) => small(ui, why, WARN),
         Phase::Connecting => match &s.error {
             Some(e) => small(ui, e, WARN),
-            None => small(ui, "Looking for the server…", theme::MUTED),
+            None => small(ui, "正在查找服务器…", theme::MUTED),
         },
         Phase::Syncing { what, done, total } => {
             let what = if *what == "text" { "small files" } else { "shaders" };
@@ -566,14 +566,14 @@ pub(super) fn stream_progress(ui: &mut egui::Ui, s: &glue5_stream::Status) {
             small(ui, &format!("Taking the {what}, once: {:.0}%", done * 100.0), theme::MUTED);
             rail(ui, done);
         }
-        Phase::Ready if s.complete => small(ui, "The whole game is on this device.", theme::MUTED),
-        Phase::Ready if !s.connected => small(ui, "Playing from this device's copy until the server answers.", theme::MUTED),
+        Phase::Ready if s.complete => small(ui, "整个游戏都在这台设备上。", theme::MUTED),
+        Phase::Ready if !s.connected => small(ui, "先用本机副本游玩，直到服务器响应。", theme::MUTED),
         Phase::Ready if s.filling => {
             let done = s.cache_bytes as f32 / s.total_bytes.max(1) as f32;
             let line = format!("Downloading the whole game: {} of {}", bytes(s.cache_bytes), bytes(s.total_bytes));
             small(ui, &line, theme::MUTED);
             if s.no_room {
-                small(ui, "Not enough space on this device: the download waits for some.", WARN);
+                small(ui, "本机空间不足：下载已暂停，等待空间。", WARN);
             }
             rail(ui, done);
         }
@@ -606,7 +606,7 @@ pub(super) fn is_server((found, check): &super::FoundServer, address: &str) -> b
 fn server_summary(settings: &Settings, status: &Status) -> String {
     let server = settings.server.trim();
     if server.is_empty() {
-        return "None chosen yet".to_owned();
+        return "尚未选择".to_owned();
     }
     let name = server_name(status, server);
     match status.stream.filter(|(s, _)| *s == server) {
@@ -621,8 +621,8 @@ fn server_summary(settings: &Settings, status: &Status) -> String {
 fn sharing_card(ui: &mut egui::Ui, sharing: &Sharing) {
     match sharing {
         Sharing::Preparing(done) => {
-            card_title(ui, "SHARING", Some(("Preparing", theme::MUTED)));
-            small(ui, "Packing the small files and the shaders, the first time.", theme::MUTED);
+            card_title(ui, "SHARING", Some(("准备中", theme::MUTED)));
+            small(ui, "首次运行：正在打包小文件和着色器。", theme::MUTED);
             if let Some(done) = done {
                 rail(ui, *done);
             }
@@ -630,13 +630,13 @@ fn sharing_card(ui: &mut egui::Ui, sharing: &Sharing) {
         Sharing::On(addresses, announced) => {
             card_title(ui, "SHARING", Some(("On", READY)));
             if addresses.is_empty() {
-                small(ui, "No network address found: is this computer on a network?", WARN);
+                small(ui, "未找到网络地址：这台电脑联网了吗？", WARN);
             } else {
                 if *announced {
-                    small(ui, "Other devices find this computer in their Servers page, or play from one of these addresses:", theme::MUTED);
+                    small(ui, "其他设备可在“服务器”页找到这台电脑，或用以下地址之一游玩：", theme::MUTED);
                 } else {
                     // Another program has the port announcements use.
-                    small(ui, "Other devices do not find this computer by themselves: type one of these addresses in their Servers page:", WARN);
+                    small(ui, "其他设备无法自动发现这台电脑：在其“服务器”页手动输入以下地址之一：", WARN);
                 }
                 for a in addresses {
                     ui.label(RichText::new(a).monospace().color(Color32::WHITE));
@@ -644,19 +644,19 @@ fn sharing_card(ui: &mut egui::Ui, sharing: &Sharing) {
             }
         }
         Sharing::Failed(why) => {
-            card_title(ui, "SHARING", Some(("Stopped", WARN)));
+            card_title(ui, "SHARING", Some(("已停止", WARN)));
             small(ui, why, WARN);
         }
     }
 }
 
 fn graphics_reset_note() -> RichText {
-    RichText::new("Graphics reset. Backup: settings.xml.bak").small().color(theme::MUTED)
+    RichText::new("画面设置已重置。备份：settings.xml.bak").small().color(theme::MUTED)
 }
 
 fn last_benchmark(ui: &mut egui::Ui, results: &crate::benchmark::Results) {
     let scale = theme::density(ui);
-    card_title(ui, "LAST BENCHMARK", None);
+    card_title(ui, "上次跑分", None);
     ui.label(theme::heading(&format!("{:.0} FPS", results.avg_fps), 34.0 * scale));
     ui.label(
         RichText::new(format!(
@@ -670,11 +670,11 @@ fn last_benchmark(ui: &mut egui::Ui, results: &crate::benchmark::Results) {
 }
 
 fn last_failure(ui: &mut egui::Ui, why: &str, reset: bool, actions: &mut Vec<Action>) {
-    card_title(ui, "LAST SESSION", Some(("Stopped", WARN)));
+    card_title(ui, "上次战局", Some(("已停止", WARN)));
     ui.label(RichText::new(why).small().color(theme::MUTED));
     if reset {
         ui.label(graphics_reset_note());
-    } else if ui.horizontal(|ui| action_button(ui, "Reset graphics")).inner.clicked() {
+    } else if ui.horizontal(|ui| action_button(ui, "重置画面设置")).inner.clicked() {
         actions.push(Action::ResetGraphics);
     }
 }
@@ -782,7 +782,7 @@ fn settings_items(
             let mut scale = scale_edit.unwrap_or(settings.render_scale());
             let (rw, rh) = settings::render_size(status.window, scale, settings.low_memory);
             let subtitle = format!("{rw} × {rh}");
-            let r = setting(ui, "Resolution", Control::Slider, Some(&subtitle), |ui| {
+            let r = setting(ui, "分辨率", Control::Slider, Some(&subtitle), |ui| {
                 slider(ui, &mut scale, RENDER_SCALES, 0.05, "%", 0)
             });
             if r.dragged() {
@@ -797,7 +797,7 @@ fn settings_items(
                     .iter()
                     .map(|&u| {
                         let name = match u {
-                            Upscaling::Bicubic => "Bicubic",
+                            Upscaling::Bicubic => "双三次",
                             Upscaling::MetalFx => "MetalFX",
                             Upscaling::MetalFxTemporal => "MetalFX Temporal",
                             Upscaling::Fsr => "FSR 2",
@@ -805,17 +805,17 @@ fn settings_items(
                         (u, name)
                     })
                     .collect();
-                setting(ui, "Upscaling", Control::Choice, None, |ui| choice(ui, &mut settings.upscaler, &options));
+                setting(ui, "超分辨率", Control::Choice, None, |ui| choice(ui, &mut settings.upscaler, &options));
             }
             if settings.upscaler == Upscaling::Fsr {
-                setting(ui, "Sharpening", Control::Slider, None, |ui| {
+                setting(ui, "锐化", Control::Slider, None, |ui| {
                     slider(ui, &mut settings.sharpness, 0.0..=1.0, 0.05, "%", 0)
                 });
             }
             if status.frame_generation && settings.upscaler == Upscaling::MetalFxTemporal {
-                setting(ui, "Frame generation", Control::Toggle, None, |ui| toggle(ui, &mut settings.frame_generation));
+                setting(ui, "帧生成", Control::Toggle, None, |ui| toggle(ui, &mut settings.frame_generation));
             }
-            let unlimited = if settings.vsync { "Display" } else { "Unlimited" };
+            let unlimited = if settings.vsync { "跟随屏幕" } else { "不限制" };
             let mut rates = vec![(0, unlimited), (60, "60")];
             if status.refresh_rate >= 119.0 {
                 rates.push((40, "40"));
@@ -823,45 +823,45 @@ fn settings_items(
             rates.push((30, "30"));
             setting(
                 ui,
-                "Frame rate",
+                "帧率",
                 Control::Choice,
                 next_start(started.is_some_and(|s| s.max_fps != settings.max_fps)),
                 |ui| choice(ui, &mut settings.max_fps, &rates),
             );
-            setting(ui, "VSync", Control::Toggle, None, |ui| toggle(ui, &mut settings.vsync));
-            let mut overlays = vec![(PerfOverlay::Off, "Off")];
+            setting(ui, "垂直同步", Control::Toggle, None, |ui| toggle(ui, &mut settings.vsync));
+            let mut overlays = vec![(PerfOverlay::Off, "关")];
             if cfg!(target_vendor = "apple") {
-                overlays.push((PerfOverlay::MetalHud, "Metal HUD"));
+                overlays.push((PerfOverlay::MetalHud, "Metal 性能层"));
             }
             overlays.push((PerfOverlay::Glue5, "Glue 5"));
             setting(
                 ui,
-                "Performance overlay",
+                "性能显示",
                 Control::Choice,
-                (settings.overlay == PerfOverlay::MetalHud && !status.metal_hud).then_some("Next launch"),
+                (settings.overlay == PerfOverlay::MetalHud && !status.metal_hud).then_some("下次启动"),
                 |ui| choice(ui, &mut settings.overlay, &overlays),
             );
             if settings.overlay == PerfOverlay::Glue5 {
-                setting(ui, "Overlay detail", Control::Choice, None, |ui| {
+                setting(ui, "性能层详细度", Control::Choice, None, |ui| {
                     choice(
                         ui,
                         &mut settings.overlay_detail,
                         &[
-                            (OverlayDetail::Minimal, "Minimal"),
-                            (OverlayDetail::Standard, "Standard"),
-                            (OverlayDetail::Full, "Full"),
+                            (OverlayDetail::Minimal, "极简"),
+                            (OverlayDetail::Standard, "标准"),
+                            (OverlayDetail::Full, "完整"),
                         ],
                     )
                 });
-                setting(ui, "Overlay position", Control::Choice, None, |ui| {
+                setting(ui, "性能层位置", Control::Choice, None, |ui| {
                     choice(
                         ui,
                         &mut settings.overlay_corner,
                         &[
-                            (Corner::TopLeft, "Top left"),
-                            (Corner::TopRight, "Top right"),
-                            (Corner::BottomLeft, "Bottom left"),
-                            (Corner::BottomRight, "Bottom right"),
+                            (Corner::TopLeft, "左上"),
+                            (Corner::TopRight, "右上"),
+                            (Corner::BottomLeft, "左下"),
+                            (Corner::BottomRight, "右下"),
                         ],
                     )
                 });
@@ -871,32 +871,32 @@ fn settings_items(
             }
         }
         SettingsTab::Controls => {
-            setting(ui, "Touch controls", Control::Choice, None, |ui| {
+            setting(ui, "触屏操作", Control::Choice, None, |ui| {
                 choice(
                     ui,
                     &mut settings.touch,
-                    &[(TouchMode::Auto, "Auto"), (TouchMode::Always, "On"), (TouchMode::Off, "Off")],
+                    &[(TouchMode::Auto, "自动"), (TouchMode::Always, "On"), (TouchMode::Off, "关")],
                 )
             })
-            .on_hover_text("Auto: shown on touch screens; hidden while using a controller or keyboard");
-            setting(ui, "Size", Control::Slider, None, |ui| {
+            .on_hover_text("自动：触屏时显示；使用手柄或键盘时隐藏");
+            setting(ui, "大小", Control::Slider, None, |ui| {
                 slider(ui, &mut settings.touch_size, 0.7..=1.5, 0.1, "×", 1)
             });
-            setting(ui, "Opacity", Control::Slider, None, |ui| {
+            setting(ui, "不透明度", Control::Slider, None, |ui| {
                 slider(ui, &mut settings.touch_opacity, 0.2..=1.0, 0.01, "%", 0)
             });
-            setting(ui, "Camera speed", Control::Slider, None, |ui| {
+            setting(ui, "镜头速度", Control::Slider, None, |ui| {
                 slider(ui, &mut settings.touch_camera, 0.25..=3.0, 0.05, "×", 2)
             });
-            setting(ui, "Aim assist", Control::Choice, None, |ui| {
+            setting(ui, "辅助瞄准", Control::Choice, None, |ui| {
                 choice(
                     ui,
                     &mut settings.touch_aim,
                     &[
                         (TouchAim::LockOn, "Lock-on"),
-                        (TouchAim::Snap, "Snap"),
+                        (TouchAim::Snap, "吸附"),
                         (TouchAim::SlowDown, "Slow-down"),
-                        (TouchAim::Off, "Off"),
+                        (TouchAim::Off, "关"),
                     ],
                 )
             })
@@ -905,56 +905,56 @@ fn settings_items(
                  then you aim. Slow-down: the camera slows down over targets. Off: free aim",
             );
             if crate::haptics::SUPPORTED {
-                setting(ui, "Haptics", Control::Toggle, None, |ui| toggle(ui, &mut settings.haptics));
+                setting(ui, "触感反馈", Control::Toggle, None, |ui| toggle(ui, &mut settings.haptics));
             }
         }
         SettingsTab::Game => {
             let r = setting(
                 ui,
-                "Low memory",
+                "低内存",
                 Control::Toggle,
                 next_start(started.is_some_and(|s| s.low_memory != settings.low_memory)),
                 |ui| toggle(ui, &mut settings.low_memory),
             )
-            .on_hover_text("Smaller engine pools; enabling this also lowers graphics settings once");
+            .on_hover_text("更小的引擎内存池；开启后会同时降低一次画面设置");
             if r.changed() && settings.low_memory {
                 settings.low_preset_written = false;
             }
             // The Apple TV has no folder for it: always a server.
             if !TV {
-                let sources = [(Source::Folder, "Folder"), (Source::Server, "Server")];
+                let sources = [(Source::Folder, "文件夹"), (Source::Server, "服务器")];
                 setting(
                     ui,
-                    "Game files",
+                    "游戏文件",
                     Control::Choice,
                     next_start(started.is_some_and(|s| s.source != settings.source)),
                     |ui| choice(ui, &mut settings.source, &sources),
                 )
-                .on_hover_text("Folder: the game on this device. Server: from a computer that shares it");
+                .on_hover_text("文件夹：游戏在本机。服务器：来自共享它的电脑");
             }
             match settings.source {
                 Source::Folder => game_folder(ui, settings, status, actions),
                 Source::Server => {
                     let summary = server_summary(settings, status);
-                    setting(ui, "Server", Control::Action, Some(&summary), |ui| {
-                        let open = action_button(ui, "Open");
+                    setting(ui, "服务器", Control::Action, Some(&summary), |ui| {
+                        let open = action_button(ui, "打开");
                         if open.clicked() {
                             *go = Some(Some(Page::Servers));
                         }
                         open
                     })
-                    .on_hover_text("The computer the game's files come from, the others on this network, this device's copy");
+                    .on_hover_text("游戏文件来源电脑、本网络中的其他设备、本机副本");
                 }
             }
             if started.is_none() {
                 setting(
                     ui,
-                    "Graphics",
+                    "画面",
                     Control::Action,
-                    if status.graphics_reset { Some("Reset to defaults") } else { None },
+                    if status.graphics_reset { Some("恢复默认") } else { None },
                     |ui| {
                         ui.add_enabled_ui(!status.graphics_reset && status.game_dir.is_some(), |ui| {
-                            if action_button(ui, "Reset graphics").clicked() {
+                            if action_button(ui, "重置画面设置").clicked() {
                                 actions.push(Action::ResetGraphics);
                             }
                         });
@@ -962,35 +962,35 @@ fn settings_items(
                 );
             }
             if started.is_some() && !MOBILE {
-                setting(ui, "Session", Control::Action, None, |ui| {
-                    if action_button(ui, "Quit game").clicked() {
+                setting(ui, "战局", Control::Action, None, |ui| {
+                    if action_button(ui, "退出游戏").clicked() {
                         actions.push(Action::Quit);
                     }
                 });
             }
             let asking = match status.friend_requests {
-                0 => "Home or Back + RB: your friends, requests, invites".to_owned(),
+                0 => "Home 或 Back + RB：好友、请求、邀请".to_owned(),
                 n => format!("{n} waiting: friend requests, game invites"),
             };
-            setting(ui, "Friends", Control::Action, Some(&asking), |ui| {
-                if action_button(ui, "Open").clicked() {
+            setting(ui, "好友", Control::Action, Some(&asking), |ui| {
+                if action_button(ui, "打开").clicked() {
                     *go = Some(Some(Page::Friends));
                 }
             });
-            setting(ui, "Friends' notifications", Control::Toggle, Some("Online, requests, invites"), |ui| {
+            setting(ui, "好友通知", Control::Toggle, Some("在线、请求、邀请"), |ui| {
                 toggle(ui, &mut settings.friend_notices);
             });
             let mods = super::mods::summary(settings, status);
-            setting(ui, "Mods", Control::Action, Some(&mods), |ui| {
-                let open = action_button(ui, "Open");
+            setting(ui, "模组", Control::Action, Some(&mods), |ui| {
+                let open = action_button(ui, "打开");
                 if open.clicked() {
                     *go = Some(Some(Page::Mods));
                 }
                 open
             });
             let version = concat!("Glue 5 ", env!("CARGO_PKG_VERSION"), " and the projects it builds on");
-            setting(ui, "Credits", Control::Action, Some(version), |ui| {
-                if action_button(ui, "View").clicked() {
+            setting(ui, "制作名单", Control::Action, Some(version), |ui| {
+                if action_button(ui, "视角").clicked() {
                     *go = Some(Some(Page::Credits));
                 }
             });
@@ -1004,21 +1004,21 @@ fn gpu_driver(ui: &mut egui::Ui, settings: &mut Settings, drivers: &Drivers, bef
     let mut options = vec![(None, "Phone's")];
     options.extend(drivers.packages.iter().map(|p| (Some(p.id.as_str()), p.name.as_str())));
     let mut chosen = settings.gpu_driver.as_deref().filter(|id| options.iter().any(|(o, _)| *o == Some(id)));
-    let shown = if chosen == drivers.in_use.as_deref() { drivers.running.as_str() } else { "Next launch" };
-    let r = setting(ui, "GPU driver", Control::Choice, Some(shown), |ui| choice(ui, &mut chosen, &options))
-        .on_hover_text("Phone's: the driver it came with. Others: Adreno Tools packages added here");
+    let shown = if chosen == drivers.in_use.as_deref() { drivers.running.as_str() } else { "下次启动" };
+    let r = setting(ui, "GPU 驱动", Control::Choice, Some(shown), |ui| choice(ui, &mut chosen, &options))
+        .on_hover_text("手机自带：随设备提供的驱动。其他：在此添加的 Adreno Tools 包");
     if r.changed() {
         settings.gpu_driver = chosen.map(str::to_owned);
     }
     if before_game {
-        let subtitle = if drivers.adding { "Adding…" } else { "Adreno Tools packages (.zip): Turnip, Qualcomm" };
-        setting(ui, "GPU drivers", Control::Actions, Some(subtitle), |ui| {
+        let subtitle = if drivers.adding { "Adding…" } else { "Adreno Tools 包（.zip）：Turnip、Qualcomm" };
+        setting(ui, "GPU 驱动", Control::Actions, Some(subtitle), |ui| {
             ui.add_enabled_ui(!drivers.adding, |ui| {
                 let remove = settings.gpu_driver.clone();
-                let labels: &[&str] = if remove.is_some() { &["Remove", "Add…"] } else { &["Add…"] };
+                let labels: &[&str] = if remove.is_some() { &["移除", "Add…"] } else { &["Add…"] };
                 let mut buttons = action_buttons(ui, labels).into_iter();
                 if let Some(id) = remove
-                    && buttons.next().is_some_and(|b| b.on_hover_text("Delete the chosen driver").clicked())
+                    && buttons.next().is_some_and(|b| b.on_hover_text("删除所选驱动").clicked())
                 {
                     actions.push(Action::RemoveDriver(id));
                 }
@@ -1031,18 +1031,18 @@ fn gpu_driver(ui: &mut egui::Ui, settings: &mut Settings, drivers: &Drivers, bef
 }
 
 fn next_start(differs: bool) -> Option<&'static str> {
-    differs.then_some("Next start")
+    differs.then_some("下次启动")
 }
 
 fn game_folder(ui: &mut egui::Ui, settings: &mut Settings, status: &Status, actions: &mut Vec<Action>) {
     let started = status.started;
     let dir = if started.is_some() { settings.game_dir.as_deref() } else { status.game_dir };
-    let mut shown = dir.map_or_else(|| "Not found".to_owned(), |d| d.display().to_string());
+    let mut shown = dir.map_or_else(|| "未找到".to_owned(), |d| d.display().to_string());
     if started.is_some_and(|s| s.source == Source::Folder && Some(s.game_dir.as_path()) != settings.game_dir.as_deref()) {
         shown.push_str(" · next start");
     }
-    setting(ui, "Game folder", Control::Action, Some(&shown), |ui| {
-        if action_button(ui, if MOBILE { "Find files" } else { "Choose…" }).clicked() {
+    setting(ui, "游戏文件夹", Control::Action, Some(&shown), |ui| {
+        if action_button(ui, if MOBILE { "查找文件" } else { "Choose…" }).clicked() {
             actions.push(if MOBILE { Action::FindGame } else { Action::ChooseGame });
         }
     });
@@ -1050,14 +1050,14 @@ fn game_folder(ui: &mut egui::Ui, settings: &mut Settings, status: &Status, acti
         let shown = match &status.sharing {
             // Turned on while the game runs: it starts with the start page.
             None if settings.share && status.started.is_some() => {
-                "Phones, tablets and TVs play it from here · next start".to_owned()
+                "手机、平板和电视从这里游玩 · 下次启动".to_owned()
             }
-            None => "Phones, tablets and TVs play it from here".to_owned(),
+            None => "手机、平板和电视从这里游玩".to_owned(),
             Some(Sharing::Preparing(_)) => "Preparing…".to_owned(),
-            Some(Sharing::On(a, _)) => a.first().map_or_else(|| "No network address".to_owned(), |a| format!("On: {a}")),
+            Some(Sharing::On(a, _)) => a.first().map_or_else(|| "无网络地址".to_owned(), |a| format!("On: {a}")),
             Some(Sharing::Failed(why)) => why.clone(),
         };
-        setting(ui, "Share on the network", Control::Toggle, Some(&shown), |ui| toggle(ui, &mut settings.share));
+        setting(ui, "在网络上共享", Control::Toggle, Some(&shown), |ui| toggle(ui, &mut settings.share));
     }
 }
 
@@ -1156,7 +1156,7 @@ mod tests {
     }
     #[test]
     fn phone_settings_use_the_height_and_keep_video_options_reachable() {
-        for (overlay, last) in [(PerfOverlay::Off, "Performance overlay"), (PerfOverlay::Glue5, "Overlay position")] {
+        for (overlay, last) in [(PerfOverlay::Off, "性能显示"), (PerfOverlay::Glue5, "性能层位置")] {
             let mut settings = Settings::default();
             settings.overlay = overlay;
             phone_video_options(settings, None, last);
@@ -1167,7 +1167,7 @@ mod tests {
             Drivers { packages, in_use: None, running: "Driver Build: 0e9a8a8".into(), adding: false, fallback: None };
         let mut settings = Settings::default();
         settings.gpu_driver = Some("turnip".into());
-        phone_video_options(settings, Some(&drivers), "GPU drivers");
+        phone_video_options(settings, Some(&drivers), "GPU 驱动");
     }
 
     /// The Video tab on a phone, `last` its last option.
@@ -1485,7 +1485,7 @@ mod tests {
             // The button with the server's icon and name.
             button = button.or_else(|| {
                 output.shapes.iter().find_map(|s| match &s.shape {
-                    egui::Shape::Text(t) if t.galley.text().contains("Server") => Some(t.visual_bounding_rect().center()),
+                    egui::Shape::Text(t) if t.galley.text().contains("服务器") => Some(t.visual_bounding_rect().center()),
                     _ => None,
                 })
             });

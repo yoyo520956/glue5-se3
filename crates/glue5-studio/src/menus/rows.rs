@@ -116,7 +116,7 @@ pub(super) fn Row(s: S, module: String, menu: u32, id: u32, push: Callback<Level
                 <div class=row_class("")>
                     {text}
                     <div class="mnumber">
-                        <button class="mstep" aria-label="Less" title="Less" prop:disabled=off on:click=move |_| by(-1.0)>"−"</button>
+                        <button class="mstep" aria-label="减少" title="减少" prop:disabled=off on:click=move |_| by(-1.0)>"−"</button>
                         <input type="number" node_ref=field aria-label=label inputmode="decimal" prop:disabled=off
                             step=move || get().3 * k() min=move || get().1.map(|m| m * k()) max=move || get().2.map(|m| m * k())
                             on:focus=move |_| focused.set(true)
@@ -127,7 +127,7 @@ pub(super) fn Row(s: S, module: String, menu: u32, id: u32, push: Callback<Level
                                     input(json!(v / k()));
                                 }
                             }/>
-                        <button class="mstep" aria-label="More" title="More" prop:disabled=off on:click=move |_| by(1.0)>"+"</button>
+                        <button class="mstep" aria-label="增加" title="增加" prop:disabled=off on:click=move |_| by(1.0)>"+"</button>
                         {unit}
                     </div>
                 </div>
@@ -206,7 +206,7 @@ pub(super) fn Row(s: S, module: String, menu: u32, id: u32, push: Callback<Level
                     {text}
                     <div class="mcolor">
                         <Show when=has_alpha>
-                            <input type="range" class="malpha" min="0" max="255" title="Opacity" aria-label="Opacity"
+                            <input type="range" class="malpha" min="0" max="255" title="不透明度" aria-label="不透明度"
                                 prop:value=opacity prop:disabled=off
                                 on:change=move |ev| input(json!(with_alpha(&rgb(), event_target_value(&ev).parse().unwrap_or(255))))/>
                         </Show>
@@ -345,14 +345,14 @@ pub(super) fn Picker(s: S, module: String, menu: u32, item: u32, pop: Callback<(
         <div class="mpicker">
             <div class="mpick-bar">
                 <Show when=move || { count() > SEARCH_FROM }>
-                    <input type="search" class="msearch" placeholder="Search" aria-label="Search the options" spellcheck="false"
+                    <input type="search" class="msearch" placeholder="搜索" aria-label="搜索选项" spellcheck="false"
                         prop:value=move || search.get() on:input=move |ev| search.set(event_target_value(&ev))/>
                 </Show>
                 <Show when=move || multi>
                     <span class="mcount">{move || format!("{} of {}", chosen.with(Vec::len), count())}</span>
                     <Show when=move || { count() > BULK_FROM }>
-                        <button class="btn small ghost" on:click=move |_| bulk(true)>"All"</button>
-                        <button class="btn small ghost" on:click=move |_| bulk(false)>"None"</button>
+                        <button class="btn small ghost" on:click=move |_| bulk(true)>"全部"</button>
+                        <button class="btn small ghost" on:click=move |_| bulk(false)>"无"</button>
                     </Show>
                 </Show>
             </div>
@@ -384,7 +384,7 @@ pub(super) fn Picker(s: S, module: String, menu: u32, item: u32, pop: Callback<(
                     }}
                 </For>
                 <Show when=move || shown_options.with(Vec::is_empty)>
-                    <p class="mempty">"Nothing matches"</p>
+                    <p class="mempty">"没有匹配项"</p>
                 </Show>
             </div>
         </div>

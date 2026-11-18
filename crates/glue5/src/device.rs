@@ -18,11 +18,11 @@ pub fn name() -> String {
 fn kind() -> &'static str {
     match std::env::consts::OS {
         "macos" => "Mac",
-        "ios" => "iPhone or iPad",
+        "ios" => "iPhone 或 iPad",
         "tvos" => "Apple TV",
         "android" => "Android",
-        "windows" => "Windows PC",
-        _ => "Linux PC",
+        "windows" => "Windows 电脑",
+        _ => "Linux 电脑",
     }
 }
 

@@ -217,7 +217,7 @@ fn Shell(s: S) -> impl IntoView {
             <StatusBar s=s/>
             <PhoneNav s=s/>
             <sidebar::ContextMenu s=s/>
-            {move || s.notice.get().map(|n| view! { <div class="toast" title="Close" on:click=move |_| s.notice.set(None)>{n}</div> })}
+            {move || s.notice.get().map(|n| view! { <div class="toast" title="关闭" on:click=move |_| s.notice.set(None)>{n}</div> })}
         </div>
     }
 }

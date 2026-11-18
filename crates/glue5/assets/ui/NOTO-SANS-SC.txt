@@ -1,0 +1,12 @@
+Noto Sans CJK SC — subset
+=========================
+
+Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font
+Name 'Source'. Noto is a trademark of Google Inc.
+
+The file NotoSansSC-Subset.otf in this directory is a subset of Noto Sans
+CJK SC (Regular), cut down to the characters this interface uses: ASCII,
+GB2312 (6763 hanzi) and common UI punctuation, 7628 code points in all.
+
+It is licensed under the SIL Open Font License, Version 1.1 — the full
+text is in OFL.txt, in this same directory.

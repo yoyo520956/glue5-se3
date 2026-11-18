@@ -63,7 +63,7 @@ pub(crate) fn TitleBar(s: S) -> impl IntoView {
             <div class="palette-wrap">
                 <label class="palette">
                     <span class="ico" inner_html=icons::SEARCH></span>
-                    <input node_ref=input placeholder="Search natives" spellcheck="false" autocomplete="off"
+                    <input node_ref=input placeholder="搜索原生函数" spellcheck="false" autocomplete="off"
                         prop:value=move || s.query.get()
                         on:focus=move |_| s.palette.set(true)
                         on:blur=move |_| set_timeout(move || s.palette.set(false), std::time::Duration::from_millis(200))
@@ -102,13 +102,13 @@ pub(crate) fn TitleBar(s: S) -> impl IntoView {
                 </Show>
             </div>
             <div class="tb-right">
-                <a class="btn ghost small" href="/control" target="_blank" rel="noopener" title="The mods and their menus, on a page of their own (for a phone too)">
-                    <span class="ico" inner_html=icons::SLIDERS></span>"Control page"
+                <a class="btn ghost small" href="/control" target="_blank" rel="noopener" title="模组及其菜单的独立页面（手机也可用）">
+                    <span class="ico" inner_html=icons::SLIDERS></span>"控制页"
                 </a>
                 <div class=move || if s.connected.get() { "device" } else { "device off" }
                     title=move || s.hello.with(|h| format!("The game runs on {}", h["device"].as_str().unwrap_or("this device")))>
                     <span class="dot"></span>
-                    <span class="name">{move || s.hello.with(|h| h["device"].as_str().unwrap_or("Game").to_string())}</span>
+                    <span class="name">{move || s.hello.with(|h| h["device"].as_str().unwrap_or("游戏").to_string())}</span>
                 </div>
             </div>
         </header>
@@ -131,8 +131,8 @@ pub(crate) fn Activity(s: S) -> impl IntoView {
     };
     view! {
         <nav class="activity">
-            {item(Side::Mods, "Mods", icons::FOLDER)}
-            {item(Side::Natives, "Natives", icons::BOOK)}
+            {item(Side::Mods, "模组", icons::FOLDER)}
+            {item(Side::Natives, "原生函数", icons::BOOK)}
         </nav>
     }
 }
@@ -143,13 +143,13 @@ pub(crate) fn StatusBar(s: S) -> impl IntoView {
     view! {
         <footer class="status">
             <span class="it"><span class=move || if s.connected.get() { "dot" } else { "dot off" }></span>
-                <b>{move || if s.connected.get() { "Connected" } else { "Offline" }}</b></span>
+                <b>{move || if s.connected.get() { "已连接" } else { "离线" }}</b></span>
             <span class="it hide-t">{move || s.hello.with(|h| format!("build {}", h["build"].as_str().unwrap_or("")))}</span>
             <Show when=move || errors() != 0>
                 <span class="it errn" on:click=move |_| s.panel.set(Panel::Problems)>{move || format!("● {} error{}", errors(), if errors() == 1 { "" } else { "s" })}</span>
             </Show>
             <Show when=move || s.hello.with(|h| h["tainted"] == true)>
-                <span class="it errn">"A native failed: restart the game soon"</span>
+                <span class="it errn">"原生调用失败：请尽快重启游戏"</span>
             </Show>
             <span class="grow"></span>
             // The editor's, while it shows a file.
@@ -157,7 +157,7 @@ pub(crate) fn StatusBar(s: S) -> impl IntoView {
                 let language = match p.rsplit_once('.').map(|(_, e)| e) {
                     Some("luau") => "Luau",
                     Some("json") => "JSON",
-                    _ => "Plain Text",
+                    _ => "纯文本",
                 };
                 view! {
                     <span class="it">{move || { let (l, c) = s.cursor.get(); format!("Ln {l}, Col {c}") }}</span>
@@ -194,10 +194,10 @@ pub(crate) fn PhoneNav(s: S) -> impl IntoView {
     };
     view! {
         <nav class="phone-nav">
-            {item(Screen::Mods, "Mods", icons::FOLDER)}
-            {item(Screen::Editor, "Editor", icons::CODE)}
-            {item(Screen::Console, "Console", icons::TERMINAL)}
-            {item(Screen::Problems, "Problems", icons::WARNING)}
+            {item(Screen::Mods, "模组", icons::FOLDER)}
+            {item(Screen::Editor, "编辑器", icons::CODE)}
+            {item(Screen::Console, "控制台", icons::TERMINAL)}
+            {item(Screen::Problems, "问题", icons::WARNING)}
             <a class="phone-control" href="/control" target="_blank" rel="noopener">
                 <span class="ico" inner_html=icons::SLIDERS></span>"Control"
             </a>

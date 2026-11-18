@@ -76,7 +76,7 @@ impl Chip {
         // wherever they cover nothing.
         let words = match alert {
             StreamAlert::Waiting => "Waiting for the server",
-            StreamAlert::Offline => "Server not answering",
+            StreamAlert::Offline => "服务器无响应",
         };
         let galley = painter.layout_no_wrap(words.into(), FontId::proportional(12.0 * scale), white(1.0));
         let text = galley.size();

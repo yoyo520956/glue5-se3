@@ -36,9 +36,9 @@ struct Client {
 const CLIENTS: &[Client] = &[
     Client {
         name: "Claude Code",
-        note: "Run once in a terminal: every project sees the game from then on.",
+        note: "在终端中运行一次：此后所有项目都能看到该游戏。",
         steps: &[Step {
-            say: "Add the server",
+            say: "添加服务器",
             lang: Lang::Bash,
             text: "claude mcp add --transport http --scope user glue5 {url} \\\n  --header \"Authorization: Bearer {token}\"",
         }],
@@ -46,7 +46,7 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Codex",
-        note: "The Codex CLI, app and IDE extension share this file (its add command takes no header).",
+        note: "Codex CLI、应用与 IDE 扩展共用此文件（其添加命令无需请求头）。",
         steps: &[Step {
             say: "Add to ~/.codex/config.toml",
             lang: Lang::Toml,
@@ -56,29 +56,29 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Cursor",
-        note: "One click adds it; or add it to ~/.cursor/mcp.json yourself.",
+        note: "一键即可添加；也可自行写入 ~/.cursor/mcp.json。",
         steps: &[Step {
             say: "~/.cursor/mcp.json",
             lang: Lang::Json,
             text: "{\n  \"mcpServers\": {\n    \"glue5\": {\n      \"url\": \"{url}\",\n      \"headers\": { \"Authorization\": \"Bearer {token}\" }\n    }\n  }\n}",
         }],
-        install: Some(("Add to Cursor", cursor_link)),
+        install: Some(("添加到 Cursor", cursor_link)),
     },
     Client {
         name: "VS Code",
-        note: "For Copilot's agent mode. One click adds it to your profile; or run the command.",
+        note: "用于 Copilot 的代理模式。一键添加到你的配置；或运行该命令。",
         steps: &[Step {
-            say: "Or in a terminal",
+            say: "或在终端中",
             lang: Lang::Bash,
             text: "code --add-mcp '{\"name\":\"glue5\",\"type\":\"http\",\"url\":\"{url}\",\"headers\":{\"Authorization\":\"Bearer {token}\"}}'",
         }],
-        install: Some(("Add to VS Code", vscode_link)),
+        install: Some(("添加到 VS Code", vscode_link)),
     },
     Client {
         name: "Copilot CLI",
-        note: "Run once in a terminal (GitHub Copilot's CLI).",
+        note: "在终端中运行一次（GitHub Copilot 的 CLI）。",
         steps: &[Step {
-            say: "Add the server",
+            say: "添加服务器",
             lang: Lang::Bash,
             text: "copilot mcp add --transport http glue5 {url} \\\n  --header \"Authorization: Bearer {token}\"",
         }],
@@ -86,7 +86,7 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Antigravity",
-        note: "Google Antigravity (it took over from Gemini CLI), the IDE and the CLI alike.",
+        note: "Google Antigravity（已取代 Gemini CLI），IDE 与 CLI 通用。",
         steps: &[Step {
             say: "~/.gemini/config/mcp_config.json",
             lang: Lang::Json,
@@ -96,9 +96,9 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Claude Desktop",
-        note: "The app's connectors reach servers from the cloud, not this computer: it uses the mcp-remote bridge instead, which needs Node.js. Restart the app after saving.",
+        note: "该应用的连接器从云端访问服务器，而非本机：因此改用 mcp-remote 桥接，需要 Node.js。保存后重启应用。",
         steps: &[Step {
-            say: "Settings › Developer › Edit Config (claude_desktop_config.json)",
+            say: "设置 › 开发者 › 编辑配置（claude_desktop_config.json）",
             lang: Lang::Json,
             text: "{\n  \"mcpServers\": {\n    \"glue5\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"mcp-remote\", \"{url}\", \"--transport\", \"http-only\", \"--allow-http\",\n               \"--header\", \"Authorization:${GLUE5_AUTH}\"],\n      \"env\": { \"GLUE5_AUTH\": \"Bearer {token}\" }\n    }\n  }\n}",
         }],
@@ -106,7 +106,7 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Windsurf",
-        note: "Windsurf, now Devin Desktop: Cascade › MCP servers › View raw config, then refresh. Older versions keep it in ~/.codeium/windsurf/mcp_config.json.",
+        note: "Windsurf（现为 Devin Desktop）：Cascade › MCP 服务器 › 查看原始配置，然后刷新。旧版本保存在 ~/.codeium/windsurf/mcp_config.json。",
         steps: &[Step {
             say: "~/.config/devin/mcp_config.json",
             lang: Lang::Json,
@@ -116,7 +116,7 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "Zed",
-        note: "In Zed's settings.json (zed: open settings file), or Settings › AI › MCP Servers › Add Remote Server.",
+        note: "在 Zed 的 settings.json 中（zed: open settings file），或 设置 › AI › MCP 服务器 › 添加远程服务器。",
         steps: &[Step {
             say: "settings.json",
             lang: Lang::Json,
@@ -126,7 +126,7 @@ const CLIENTS: &[Client] = &[
     },
     Client {
         name: "opencode",
-        note: "In ~/.config/opencode/opencode.json, or the project's opencode.json.",
+        note: "在 ~/.config/opencode/opencode.json 中，或项目的 opencode.json 中。",
         steps: &[Step {
             say: "opencode.json",
             lang: Lang::Json,
@@ -135,11 +135,11 @@ const CLIENTS: &[Client] = &[
         install: None,
     },
     Client {
-        name: "Other",
-        note: "Any MCP client that speaks Streamable HTTP (JetBrains, Cline, Goose, Kiro…): the address, and the header to send.",
+        name: "其他",
+        note: "任何支持 Streamable HTTP 的 MCP 客户端（JetBrains、Cline、Goose、Kiro…）：填入地址与要发送的请求头。",
         steps: &[
-            Step { say: "Server address", lang: Lang::Bash, text: "{url}" },
-            Step { say: "Header", lang: Lang::Bash, text: "Authorization: Bearer {token}" },
+            Step { say: "服务器地址", lang: Lang::Bash, text: "{url}" },
+            Step { say: "请求头", lang: Lang::Bash, text: "Authorization: Bearer {token}" },
         ],
         install: None,
     },
@@ -147,7 +147,7 @@ const CLIENTS: &[Client] = &[
 
 /// The server's configuration as Cursor and VS Code take it (JSON).
 fn server(url: &str, token: &str) -> serde_json::Value {
-    json!({ "url": url, "headers": { "Authorization": format!("Bearer {token}") } })
+    json!({ "url": url, "headers": { "授权": format!("Bearer {token}") } })
 }
 
 /// Cursor's install link: the configuration in base64.
@@ -210,8 +210,8 @@ fn Snippet(lang: Lang, text: String, ready: bool) -> impl IntoView {
         <div class="snippet" data-lang=lang.name()>
             <pre><code>{code}</code></pre>
             <button class="btn small ghost copy" disabled=!ready on:click=copy
-                title=if ready { "Copy" } else { "Make the token first" }>
-                {move || if copied.get() { "Copied" } else { "Copy" }}
+                title=if ready { "复制" } else { "先生成令牌" }>
+                {move || if copied.get() { "已复制" } else { "复制" }}
             </button>
         </div>
     }
@@ -262,10 +262,10 @@ pub(crate) fn Agents() -> impl IntoView {
             <p class="agent-note">{client.note}</p>
             <ol class="agent-steps">
                 <li>
-                    <span class="say">"A token of its own"</span>
+                    <span class="say">"使用独立令牌"</span>
                     {match token {
                         Some(_) => view! {
-                            <p class="made">"Done: “"{name}"” has a pairing of its own. The game lists it under Mods › Studio; removing it there cuts it off."</p>
+                            <p class="made">"Done: “"{name}"”拥有独立配对。游戏会在 模组 › Studio 下列出它；在那里移除即可断开。"</p>
                         }.into_any(),
                         None => view! {
                             <div class="make">
@@ -276,21 +276,21 @@ pub(crate) fn Agents() -> impl IntoView {
                     }}
                 </li>
                 {steps}
-                {install.map(|a| view! { <li><span class="say">"Or in one click"</span>{a}</li> })}
+                {install.map(|a| view! { <li><span class="say">"或一键添加"</span>{a}</li> })}
             </ol>
         }
     };
     view! {
         <section class="agents" aria-labelledby="agents-h">
-            <h2 id="agents-h">"Build with an AI agent"</h2>
-            <p class="lead">"Agents work on the game through MCP: they read every native's type, write and check mods, run them, read their logs and use their menus."</p>
+            <h2 id="agents-h">"用 AI 代理构建"</h2>
+            <p class="lead">"代理通过 MCP 操作游戏：读取每个原生函数的类型、编写并检查模组、运行模组、读取日志、使用其菜单。"</p>
             <div class="agent-tabs" role="tablist">
                 {CLIENTS.iter().enumerate().map(|(i, c)| view! {
                     <button role="tab" class=move || if chosen.get() == i { "on" } else { "" }
                         aria-selected=move || (chosen.get() == i).to_string()
                         on:click=move |_| chosen.set(i)>
                         {c.name}
-                        <Show when=move || tokens.with(|t| t.contains_key(c.name))><span class="paired" title="Paired"></span></Show>
+                        <Show when=move || tokens.with(|t| t.contains_key(c.name))><span class="paired" title="已配对"></span></Show>
                     </button>
                 }).collect_view()}
             </div>

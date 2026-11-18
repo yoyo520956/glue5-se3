@@ -81,7 +81,7 @@ pub fn list(user_dir: &Path) -> Vec<Package> {
 /// Adds the package in `zip` (one with the same name is replaced: a newer
 /// build of it).
 pub fn add(user_dir: &Path, zip: &[u8]) -> Result<Package, String> {
-    let mut files = glue5_mods::zip::read_up_to(zip, MAX_FILES, MAX_SIZE, "a GPU driver package")?;
+    let mut files = glue5_mods::zip::read_up_to(zip, MAX_FILES, MAX_SIZE, "一个 GPU 驱动包")?;
     // Zipped in a folder of its own, or not.
     if let Some((top, _)) = files.first().and_then(|(n, _)| n.split_once('/'))
         && files.iter().all(|(n, _)| n.starts_with(top) && n[top.len()..].starts_with('/'))
@@ -92,9 +92,9 @@ pub fn add(user_dir: &Path, zip: &[u8]) -> Result<Package, String> {
         }
     }
     if files.iter().any(|(n, _)| n.contains('/')) {
-        return Err("not a GPU driver package: it has folders".into());
+        return Err("不是 GPU 驱动包：其中含文件夹".into());
     }
-    let meta = files.iter().find(|(n, _)| n == "meta.json").ok_or("not a GPU driver package: no meta.json")?;
+    let meta = files.iter().find(|(n, _)| n == "meta.json").ok_or("不是 GPU 驱动包：缺少 meta.json")?;
     let meta: Meta = serde_json::from_slice(&meta.1).map_err(|e| format!("its meta.json: {e}"))?;
     let library = files.iter().find(|(n, _)| *n == meta.library_name);
     if !library.is_some_and(|(_, data)| data.starts_with(b"\x7fELF")) {

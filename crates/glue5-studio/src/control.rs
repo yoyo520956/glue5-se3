@@ -55,19 +55,19 @@ pub(crate) fn Control(s: S) -> impl IntoView {
         <div class=move || if open.get().is_some() { "ctl detail" } else { "ctl" }>
             <header class="ctl-bar">
                 <div class="brand"><img src="/logo.png" alt=""/><b>"GLUE 5"</b><span>"CONTROL"</span></div>
-                <div class=move || if s.connected.get() { "device" } else { "device off" } title=move || if s.connected.get() { "Connected to the game" } else { "Reconnecting…" }>
+                <div class=move || if s.connected.get() { "device" } else { "device off" } title=move || if s.connected.get() { "已连接到游戏" } else { "Reconnecting…" }>
                     <span class="dot"></span>
-                    <span class="name">{move || s.hello.with(|h| h["device"].as_str().unwrap_or("Game").to_string())}</span>
+                    <span class="name">{move || s.hello.with(|h| h["device"].as_str().unwrap_or("游戏").to_string())}</span>
                 </div>
             </header>
             <div class="ctl-body">
-                <aside class="ctl-list" aria-label="Mods">
+                <aside class="ctl-list" aria-label="模组">
                     <ModList s=s open=open show=show/>
                 </aside>
                 <main class="ctl-detail">
                     {move || match open.get() {
                         Some(name) => view! { <ModView s=s name=name show=show/> }.into_any(),
-                        None => view! { <div class="ctl-pick"><p>"Pick a mod to use its menus."</p></div> }.into_any(),
+                        None => view! { <div class="ctl-pick"><p>"选择一个模组以使用其菜单。"</p></div> }.into_any(),
                     }}
                 </main>
             </div>
@@ -81,9 +81,9 @@ pub(crate) fn Control(s: S) -> impl IntoView {
 #[component]
 fn ModList(s: S, open: RwSignal<Option<String>>, show: Callback<Option<String>>) -> impl IntoView {
     view! {
-        <h2 class="ctl-h">"Mods"</h2>
+        <h2 class="ctl-h">"模组"</h2>
         <Show when=move || s.listed.get() && s.mods.with(Vec::is_empty)>
-            <p class="ctl-empty">"No mods yet. Write one in GLUE 5 Studio, on a computer."</p>
+            <p class="ctl-empty">"还没有模组。在电脑上用 GLUE 5 Studio 编写一个。"</p>
         </Show>
         <div class="ctl-mods">
             <For each=move || s.mods.get() key=|m| format!("{}|{}|{}|{}", m.name, m.state, m.title, m.error.clone().unwrap_or_default()) let(m)>{{
@@ -113,7 +113,7 @@ fn ModList(s: S, open: RwSignal<Option<String>>, show: Callback<Option<String>>)
                             }}</span>
                             <span class="ctl-chev" aria-hidden="true">"›"</span>
                         </button>
-                        <label class="switch big" title=if running { "Stop" } else { "Start" }>
+                        <label class="switch big" title=if running { "停止" } else { "启动" }>
                             <input type="checkbox" aria-label=format!("{} runs", m.title) prop:checked=running
                                 on:change=move |ev| run(s, &n_run, event_target_checked(&ev))/>
                             <i></i>
@@ -164,44 +164,44 @@ fn ModView(s: S, name: String, show: Callback<Option<String>>) -> impl IntoView 
     view! {
         <div class="ctl-view">
             <div class="ctl-view-head">
-                <button class="mback ctl-back" title="Mods" aria-label="Back to the mods" on:click=back>"‹"</button>
+                <button class="mback ctl-back" title="模组" aria-label="返回模组" on:click=back>"‹"</button>
                 <div class="ctl-view-title">
                     <h1>{move || info().map(|m| m.title).unwrap_or_else(|| name.clone())}</h1>
                     <small>{move || match info2() {
-                        None => "Not in the mods folder".to_string(),
+                        None => "不在模组文件夹中".to_string(),
                         Some(m) if m.state == "running" => format!("Running · {:.2} ms a frame", m.cpu_ms),
-                        Some(m) if m.state == "error" => "Stopped by an error".to_string(),
-                        Some(_) => "Stopped".to_string(),
+                        Some(m) if m.state == "error" => "因错误停止".to_string(),
+                        Some(_) => "已停止".to_string(),
                     }}</small>
                 </div>
                 <Show when=move || info3().is_some_and(|m| m.state == "running")>
-                    <button class="btn small ghost" title="Restart" aria-label="Restart" on:click={ let n = n_restart.clone(); move |_| {
+                    <button class="btn small ghost" title="重启" aria-label="重启" on:click={ let n = n_restart.clone(); move |_| {
                         request("mods.restart", json!({ "name": n }), move |r| if let Err(e) = r { s.notice.set(Some(e)) });
                     } }>
                         <span class="ico" inner_html=icons::RESTART></span>
                     </button>
                 </Show>
-                <label class="switch big" title="Runs">
-                    <input type="checkbox" aria-label="Runs" prop:checked=move || info5().is_some_and(|m| m.state == "running")
+                <label class="switch big" title="运行中">
+                    <input type="checkbox" aria-label="运行中" prop:checked=move || info5().is_some_and(|m| m.state == "running")
                         on:change={ let n = n_switch.clone(); move |ev| run(s, &n, event_target_checked(&ev)) }/>
                     <i></i>
                 </label>
             </div>
             // Made again only when what shows changes (not each second's figures).
             {move || match shown.get() {
-                Shown::Missing => view! { <p class="ctl-empty">"This mod is not in the game's mods folder."</p> }.into_any(),
+                Shown::Missing => view! { <p class="ctl-empty">"此模组不在游戏的模组文件夹中。"</p> }.into_any(),
                 Shown::Off(error) => {
                     let n = n_run.clone();
                     view! {
                         <div class="ctl-off">
                             {error.map(|e| view! { <p class="err">{e}</p> })}
-                            <p>"Start it to use its menus."</p>
-                            <button class="btn primary wide" on:click=move |_| run(s, &n, true)>"Start"</button>
+                            <p>"启动后才能使用其菜单。"</p>
+                            <button class="btn primary wide" on:click=move |_| run(s, &n, true)>"启动"</button>
                         </div>
                     }
                     .into_any()
                 }
-                Shown::NoMenu => view! { <p class="ctl-empty">"It runs, and has no menu."</p> }.into_any(),
+                Shown::NoMenu => view! { <p class="ctl-empty">"它在运行，但没有菜单。"</p> }.into_any(),
                 Shown::Menus => view! { <Menus s=s module=n_menus.clone()/> }.into_any(),
             }}
         </div>

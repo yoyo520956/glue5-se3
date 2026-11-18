@@ -117,8 +117,8 @@ pub(crate) fn ModPage(s: S, name: String) -> impl IntoView {
                     {move || state().map(|m| {
                         let (class, text) = match m.state.as_str() {
                             "running" => ("pill ok", format!("Running · {:.1} ms", m.cpu_ms)),
-                            "error" => ("pill err", "Error".to_string()),
-                            _ => ("pill", "Stopped".to_string()),
+                            "error" => ("pill err", "错误".to_string()),
+                            _ => ("pill", "已停止".to_string()),
                         };
                         view! { <span class=class>{text}</span> }
                     })}
@@ -127,39 +127,39 @@ pub(crate) fn ModPage(s: S, name: String) -> impl IntoView {
                 {move || failed().map(|e| view! { <div class="mp-error">{crate::panel::linked(s, e)}</div> })}
                 <div class="mp-card">
                     <h2>"MOD"</h2>
-                    {field("Name", "As the game's Mods page shows it", title, false, 40)}
+                    {field("名称", "与游戏的模组页显示一致", title, false, 40)}
                     <div class="mp-row">
-                        <div class="lab"><b>"Description"</b><small>"One or two lines"</small></div>
+                        <div class="lab"><b>"描述"</b><small>"一两行"</small></div>
                         <textarea class="f" maxlength="300" prop:value=move || description.get()
                             on:input=move |ev| description.set(event_target_value(&ev))
                             on:change=move |_| save_d()></textarea>
                     </div>
-                    {field("Author", "", author, false, 60)}
-                    {field("Version", "", version, true, 20)}
+                    {field("作者", "", author, false, 60)}
+                    {field("版本", "", version, true, 20)}
                 </div>
                 <div class="mp-card">
                     <h2>"RUNNING"</h2>
                     <div class="mp-row">
-                        <div class="lab"><b>"Starts with the game"</b><small>"Otherwise from the Mods page or here"</small></div>
+                        <div class="lab"><b>"随游戏启动"</b><small>"否则从模组页或此处"</small></div>
                         <label class="switch"><input type="checkbox" prop:checked=move || autostart.get()
                             on:change=move |ev| { autostart.set(event_target_checked(&ev)); save_a(); }/><i></i></label>
                     </div>
                     <div class="mp-row">
-                        <div class="lab"><b>"Restart when a file is saved"</b><small>"While it runs: saving reloads it at once"</small></div>
+                        <div class="lab"><b>"保存文件后重启"</b><small>"运行中：保存后立即重新加载"</small></div>
                         <label class="switch"><input type="checkbox" prop:checked=move || restart.get()
                             on:change=move |ev| { restart.set(event_target_checked(&ev)); save_r(); }/><i></i></label>
                     </div>
                 </div>
                 <div class="mp-card">
-                    <h2>"STORED DATA"</h2>
+                    <h2>"存储数据"</h2>
                     <div class="mp-row">
                         <div class="lab">
                             <b>{move || match stored.get() {
-                                (0, _) => "Nothing stored".to_string(),
+                                (0, _) => "暂无存储".to_string(),
                                 (1, b) => format!("1 key · {}", size(b)),
                                 (k, b) => format!("{k} keys · {}", size(b)),
                             }}</b>
-                            <small>"What it keeps between sessions (storage), for this player only"</small>
+                            <small>"它在会话之间保存的内容（存储），仅限本玩家"</small>
                         </div>
                         <button class="btn" disabled=move || stored.get().0 == 0 && view_data.get().is_none() on:click=move |_| {
                             if view_data.get_untracked().is_some() { view_data.set(None); return; }
@@ -167,28 +167,28 @@ pub(crate) fn ModPage(s: S, name: String) -> impl IntoView {
                                 let pretty = serde_json::from_str::<Value>(&t).ok().and_then(|v| serde_json::to_string_pretty(&v).ok()).unwrap_or(t);
                                 view_data.set(Some(pretty));
                             });
-                        }>{move || if view_data.get().is_some() { "Hide" } else { "View" }}</button>
+                        }>{move || if view_data.get().is_some() { "隐藏" } else { "显示" }}</button>
                         <button class="btn" disabled=move || stored.get().0 == 0 on:click=move |_| {
-                            let ok = web_sys::window().and_then(|w| w.confirm_with_message("Clear what this mod stored? It cannot be undone.").ok()).unwrap_or(false);
+                            let ok = web_sys::window().and_then(|w| w.confirm_with_message("清除此模组存储的数据？此操作无法撤销。").ok()).unwrap_or(false);
                             if !ok { return; }
                             let load = load.clone();
                             request("storage.clear", json!({ "mod": n_clear.clone() }), move |_| { view_data.set(None); load(); });
-                        }>"Clear"</button>
+                        }>"清除"</button>
                     </div>
                     {move || view_data.get().map(|t| view! { <pre class="mp-data">{t}</pre> })}
                 </div>
                 <div class="mp-card">
                     <h2>"USE"</h2>
                     <div class="mp-row">
-                        <div class="lab"><b>"Control page"</b><small>"Its menus on a page of their own: on a phone, or beside the game"</small></div>
-                        <button class="btn" on:click={ let n = n_control.clone(); move |_| crate::sidebar::open_control(&n) }>"Open"</button>
+                        <div class="lab"><b>"控制页"</b><small>"其菜单独立成页：可在手机上，或与游戏并排"</small></div>
+                        <button class="btn" on:click={ let n = n_control.clone(); move |_| crate::sidebar::open_control(&n) }>"打开"</button>
                     </div>
                 </div>
                 <div class="mp-card">
                     <h2>"SHARE"</h2>
                     <div class="mp-row">
-                        <div class="lab"><b>"Export"</b><small>"A .zip with its files and this page, without the stored data"</small></div>
-                        <a class="btn" href=export download="">"Download .zip"</a>
+                        <div class="lab"><b>"导出"</b><small>"包含其文件与本页面的 .zip，不含存储数据"</small></div>
+                        <a class="btn" href=export download="">"下载 .zip"</a>
                     </div>
                 </div>
                 <div class="mp-actions">
@@ -202,7 +202,7 @@ pub(crate) fn ModPage(s: S, name: String) -> impl IntoView {
                             Ok(_) => close_mod(s, &n),
                             Err(e) => s.notice.set(Some(e)),
                         });
-                    }>"Delete mod…"</button>
+                    }>"删除模组…"</button>
                 </div>
             </div>
         </div>

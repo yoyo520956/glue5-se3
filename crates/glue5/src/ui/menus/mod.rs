@@ -310,7 +310,7 @@ impl MenusView {
     fn menu(&mut self, ui: &mut Ui, menu: &Menu, landing: &mut Landing, out: &mut Vec<Out>) {
         let query = match self.stack.last_mut() {
             Some(open) if menu.search => {
-                text_field(ui, "", TextKind::Text, &mut open.query, "Search", 40);
+                text_field(ui, "", TextKind::Text, &mut open.query, "搜索", 40);
                 open.query.trim().to_lowercase()
             }
             _ => String::new(),
@@ -404,7 +404,7 @@ fn back_id() -> Id {
 fn back_button(ui: &mut Ui, rect: Rect) -> Response {
     let s = density(ui);
     let response = ui.interact(rect, back_id(), Sense::click());
-    response.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), "Back"));
+    response.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), "返回"));
     let c = rect.center();
     ui.painter().circle_filled(c, 18.0 * s, egui::Color32::from_gray(if response.hovered() { 60 } else { 32 }));
     let stroke = egui::Stroke::new(1.6, egui::Color32::WHITE);
@@ -414,7 +414,7 @@ fn back_button(ui: &mut Ui, rect: Rect) -> Response {
     if response.has_focus() {
         ui.painter().circle_stroke(c, 20.0 * s, egui::Stroke::new(1.0, egui::Color32::WHITE));
     }
-    focus(response).on_hover_text("Back")
+    focus(response).on_hover_text("返回")
 }
 
 /// Gives a level's rows what a push or a pop left: the focus, the view.

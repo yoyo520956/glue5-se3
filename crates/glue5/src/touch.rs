@@ -188,11 +188,11 @@ pub fn load_icon(ctx: &egui::Context, name: &str) -> Option<egui::TextureHandle>
 
 // In every layout: the camera view and pause at the top's middle (the
 // app's settings button beside them, ui.rs).
-const VIEW: Action = action("View", "view", button::SELECT, At::MidTop(-54.0, 30.0), 20.0);
+const VIEW: Action = action("视角", "view", button::SELECT, At::MidTop(-54.0, 30.0), 20.0);
 const PAUSE: Action = action("☰", "pause", button::START, At::MidTop(0.0, 30.0), 20.0);
 
 /// The phone, on the right below the game's HUD.
-const PHONE: Action = action("Phone", "phone", button::UP, At::RightBottom(46.0, 334.0), 22.0);
+const PHONE: Action = action("手机", "phone", button::UP, At::RightBottom(46.0, 334.0), 22.0);
 /// Two columns on the left, between the game's help text and its radar.
 const LEFT_1: At = At::LeftBottom(46.0, 318.0);
 const LEFT_2: At = At::LeftBottom(46.0, 258.0);
@@ -200,7 +200,7 @@ const LEFT_3: At = At::LeftBottom(46.0, 202.0);
 const LEFT_4: At = At::LeftBottom(104.0, 288.0);
 const LEFT_5: At = At::LeftBottom(104.0, 232.0);
 /// The character wheel, in every layout but a cutscene's.
-const SWITCH: Action = wheel(action("Switch", "switch", button::DOWN, LEFT_4, 22.0));
+const SWITCH: Action = wheel(action("切换", "switch", button::DOWN, LEFT_4, 22.0));
 
 /// The main buttons of the layouts in vehicles sit here: the right thumb's
 /// throttle and brake, then around them.
@@ -218,14 +218,14 @@ static ON_FOOT: &[Action] = &[
     does(22, action("Jump", "jump", button::WEST, At::RightBottom(64.0, 64.0), 28.0)),
     does(23, near_vehicle(action("Enter", "enter", button::NORTH, At::RightBottom(180.0, 214.0), 28.0))),
     action("Melee\nReload", "melee", button::EAST, At::RightBottom(268.0, 52.0), 24.0),
-    does(44, action("Cover", "cover", button::R1, At::RightBottom(78.0, 262.0), 24.0)),
-    does(51, action("Action", "action", button::RIGHT, At::RightBottom(274.0, 136.0), 24.0)),
+    does(44, action("掩护", "cover", button::R1, At::RightBottom(78.0, 262.0), 24.0)),
+    does(51, action("动作", "action", button::RIGHT, At::RightBottom(274.0, 136.0), 24.0)),
     PHONE,
     does(37, wheel(action("Weapons", "weapons", button::L1, LEFT_1, 24.0))),
-    action("Special", "special", button::L3 | button::R3, LEFT_2, 22.0),
+    action("特殊", "special", button::L3 | button::R3, LEFT_2, 22.0),
     does(36, action("Crouch", "crouch", button::L3, LEFT_3, 22.0)),
     SWITCH,
-    does(58, action("Throw", "throw", button::LEFT, LEFT_5, 22.0)),
+    does(58, action("投掷", "throw", button::LEFT, LEFT_5, 22.0)),
     VIEW,
     PAUSE,
 ];
@@ -234,29 +234,29 @@ static ON_FOOT: &[Action] = &[
 static CAR: &[Action] = &[
     primary(with_phone(action("Gas", "gas", button::R2, MAIN, 36.0))),
     with_phone(action("Brake", "brake", button::L2, SECOND, 32.0)),
-    action("Exit", "exit", button::NORTH, THIRD, 26.0),
+    action("下车", "exit", button::NORTH, THIRD, 26.0),
     with_phone(action("H.brake", "handbrake", button::R1, FOURTH, 26.0)),
-    action("Horn", "horn", button::L3, FIFTH, 22.0),
+    action("喇叭", "horn", button::L3, FIFTH, 22.0),
     // Drive-by: LB aims, RB fires.
-    action("Shoot", "fire", button::L1 | button::R1, SIXTH, 22.0),
+    action("射击", "fire", button::L1 | button::R1, SIXTH, 22.0),
     PHONE,
     wheel(action("Radio", "radio", button::LEFT, LEFT_1, 24.0)),
-    action("Lights", "lights", button::RIGHT, LEFT_2, 22.0),
-    action("Behind", "behind", button::R3, LEFT_3, 22.0),
+    action("灯光", "lights", button::RIGHT, LEFT_2, 22.0),
+    action("后方", "behind", button::R3, LEFT_3, 22.0),
     SWITCH,
     // Franklin's, at the wheel.
-    action("Special", "drive-special", button::L3 | button::R3, LEFT_5, 22.0),
+    action("特殊", "drive-special", button::L3 | button::R3, LEFT_5, 22.0),
     VIEW,
     PAUSE,
 ];
 
 static BICYCLE: &[Action] = &[
-    primary(action("Pedal", "gas", button::SOUTH, MAIN, 36.0)),
+    primary(action("踏板", "gas", button::SOUTH, MAIN, 36.0)),
     with_phone(action("Brake", "brake", button::L2, SECOND, 32.0)),
-    action("Exit", "exit", button::NORTH, THIRD, 26.0),
-    action("Bell", "bell", button::L3, FIFTH, 22.0),
+    action("下车", "exit", button::NORTH, THIRD, 26.0),
+    action("铃铛", "bell", button::L3, FIFTH, 22.0),
     PHONE,
-    action("Behind", "behind", button::R3, LEFT_3, 22.0),
+    action("后方", "behind", button::R3, LEFT_3, 22.0),
     SWITCH,
     VIEW,
     PAUSE,
@@ -265,10 +265,10 @@ static BICYCLE: &[Action] = &[
 /// Helicopters (the stick pitches and rolls).
 static HELI: &[Action] = &[
     primary(with_phone(action("Up", "gas", button::R2, MAIN, 34.0))),
-    with_phone(action("Down", "brake", button::L2, SECOND, 30.0)),
-    action("Exit", "exit", button::NORTH, FIFTH, 24.0),
-    with_phone(action("◀ Yaw", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0)),
-    with_phone(action("Yaw ▶", "yaw-right", button::R1, FOURTH, 24.0)),
+    with_phone(action("下", "brake", button::L2, SECOND, 30.0)),
+    action("下车", "exit", button::NORTH, FIFTH, 24.0),
+    with_phone(action("◀ 左转", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0)),
+    with_phone(action("右转 ▶", "yaw-right", button::R1, FOURTH, 24.0)),
     action("Fire", "fire", button::SOUTH, SIXTH, 24.0),
     PHONE,
     SWITCH,
@@ -277,25 +277,25 @@ static HELI: &[Action] = &[
 ];
 
 static PLANE: &[Action] = &[
-    primary(with_phone(action("Throttle", "gas", button::R2, MAIN, 34.0))),
+    primary(with_phone(action("油门", "gas", button::R2, MAIN, 34.0))),
     with_phone(action("Brake", "brake", button::L2, SECOND, 30.0)),
-    action("Exit", "exit", button::NORTH, FIFTH, 24.0),
-    with_phone(action("◀ Yaw", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0)),
-    with_phone(action("Yaw ▶", "yaw-right", button::R1, FOURTH, 24.0)),
+    action("下车", "exit", button::NORTH, FIFTH, 24.0),
+    with_phone(action("◀ 左转", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0)),
+    with_phone(action("右转 ▶", "yaw-right", button::R1, FOURTH, 24.0)),
     action("Fire", "fire", button::SOUTH, SIXTH, 24.0),
     PHONE,
-    action("Gear", "landing-gear", button::L3, LEFT_3, 22.0),
+    action("挡位", "landing-gear", button::L3, LEFT_3, 22.0),
     SWITCH,
     VIEW,
     PAUSE,
 ];
 
 static SUBMARINE: &[Action] = &[
-    primary(with_phone(action("Ahead", "gas", button::R2, MAIN, 34.0))),
-    with_phone(action("Back", "brake", button::L2, SECOND, 30.0)),
-    action("Rise", "rise", button::WEST, SIXTH, 24.0),
-    action("Dive", "dive", button::SOUTH, FIFTH, 24.0),
-    action("Exit", "exit", button::NORTH, At::RightBottom(160.0, 250.0), 24.0),
+    primary(with_phone(action("前方", "gas", button::R2, MAIN, 34.0))),
+    with_phone(action("返回", "brake", button::L2, SECOND, 30.0)),
+    action("上升", "rise", button::WEST, SIXTH, 24.0),
+    action("下潜", "dive", button::SOUTH, FIFTH, 24.0),
+    action("下车", "exit", button::NORTH, At::RightBottom(160.0, 250.0), 24.0),
     PHONE,
     SWITCH,
     VIEW,
@@ -304,14 +304,14 @@ static SUBMARINE: &[Action] = &[
 
 /// A passenger: shooting from the window (LT aims, RT fires).
 static PASSENGER: &[Action] = &[
-    primary(turns(action("Shoot", "fire", button::R2, MAIN, 34.0))),
+    primary(turns(action("射击", "fire", button::R2, MAIN, 34.0))),
     turns(action("Aim", "aim", button::L2, SECOND, 30.0)),
-    action("Exit", "exit", button::NORTH, THIRD, 26.0),
+    action("下车", "exit", button::NORTH, THIRD, 26.0),
     // The driver's seat, when free.
-    action("Seat", "seat", button::RIGHT, FIFTH, 22.0),
+    action("座位", "seat", button::RIGHT, FIFTH, 22.0),
     PHONE,
     wheel(action("Radio", "radio", button::LEFT, LEFT_1, 24.0)),
-    action("Behind", "behind", button::R3, LEFT_3, 22.0),
+    action("后方", "behind", button::R3, LEFT_3, 22.0),
     SWITCH,
     VIEW,
     PAUSE,
@@ -319,10 +319,10 @@ static PASSENGER: &[Action] = &[
 
 /// Skydiving, then under the parachute (the stick steers).
 static PARACHUTE: &[Action] = &[
-    primary(action("Open", "parachute", button::SOUTH, MAIN, 34.0)),
-    action("Detach", "detach", button::NORTH, THIRD, 26.0),
-    action("◀ Brake", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0),
-    action("Brake ▶", "yaw-right", button::R1, FOURTH, 24.0),
+    primary(action("打开", "parachute", button::SOUTH, MAIN, 34.0)),
+    action("分离", "detach", button::NORTH, THIRD, 26.0),
+    action("◀ 刹车", "yaw-left", button::L1, At::RightBottom(160.0, 250.0), 24.0),
+    action("刹车 ▶", "yaw-right", button::R1, FOURTH, 24.0),
     PHONE,
     SWITCH,
     VIEW,
@@ -340,8 +340,8 @@ static ASKED: &[Action] = &[];
 
 /// A warning of the engine's whose buttons are not known.
 static ALERT: &[Action] = &[
-    primary(action("Select", "check", button::SOUTH, At::RightBottom(70.0, 130.0), 32.0)),
-    action("Back", "back", button::EAST, At::RightBottom(150.0, 50.0), 24.0),
+    primary(action("选择", "check", button::SOUTH, At::RightBottom(70.0, 130.0), 32.0)),
+    action("返回", "back", button::EAST, At::RightBottom(150.0, 50.0), 24.0),
 ];
 
 /// A script's scene that asks for nothing (a death, a character's switch, a
@@ -357,8 +357,8 @@ static SCRIPTED: &[Action] = &[
     action("▼", "down", button::DOWN, At::RightBottom(236.0, 86.0), 24.0),
     action("◀", "left", button::LEFT, At::RightBottom(288.0, 138.0), 24.0),
     action("▶", "right", button::RIGHT, At::RightBottom(184.0, 138.0), 24.0),
-    primary(action("Select", "check", button::SOUTH, At::RightBottom(70.0, 130.0), 32.0)),
-    action("Back", "back", button::EAST, At::RightBottom(150.0, 50.0), 24.0),
+    primary(action("选择", "check", button::SOUTH, At::RightBottom(70.0, 130.0), 32.0)),
+    action("返回", "back", button::EAST, At::RightBottom(150.0, 50.0), 24.0),
     VIEW,
     PAUSE,
 ];
@@ -370,8 +370,8 @@ static PHONE_KEYS: [Action; 6] = [
     action("▼", "down", button::DOWN, MAIN, 22.0),
     action("◀", "left", button::LEFT, MAIN, 22.0),
     action("▶", "right", button::RIGHT, MAIN, 22.0),
-    primary(action("Select", "check", button::SOUTH, MAIN, 26.0)),
-    action("Back", "back", button::EAST, MAIN, 22.0),
+    primary(action("选择", "check", button::SOUTH, MAIN, 26.0)),
+    action("返回", "back", button::EAST, MAIN, 22.0),
 ];
 
 /// In the pause menu, a finger is the mouse (tap: a click, drag: the map
@@ -389,7 +389,7 @@ pub enum MenuKey {
     Enter,
 }
 const MENU_KEYS: [(MenuKey, Action); 6] = [
-    (MenuKey::Back, action("Back", "back", 0, At::LeftTop(56.0, 46.0), 24.0)),
+    (MenuKey::Back, action("返回", "back", 0, At::LeftTop(56.0, 46.0), 24.0)),
     (MenuKey::Left, action("◀", "left", 0, At::RightBottom(116.0, 150.0), 20.0)),
     (MenuKey::Right, action("▶", "right", 0, At::RightBottom(28.0, 150.0), 20.0)),
     (MenuKey::Up, action("▲", "up", 0, At::RightBottom(72.0, 194.0), 20.0)),

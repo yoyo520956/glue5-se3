@@ -48,11 +48,11 @@ pub(super) fn header(ui: &mut Ui, item: &MenuItem, filtered: &[usize]) -> Option
     let mut input = None;
     if options.len() > ALL_FROM {
         // Right to left: None, then All.
-        if inline_button(ui, "None").clicked() {
+        if inline_button(ui, "无").clicked() {
             let left: Vec<u16> = selected.iter().copied().filter(|&i| !filtered.contains(&usize::from(i))).collect();
             input = Some(MenuInput::Select(left));
         }
-        if inline_button(ui, "All").clicked() {
+        if inline_button(ui, "全部").clicked() {
             let mut all: Vec<u16> = selected.iter().copied().chain(filtered.iter().map(|&i| i as u16)).collect();
             all.sort_unstable();
             all.dedup();
@@ -74,10 +74,10 @@ pub(super) fn list(
     let s = density(ui);
     let options = options(item);
     if options.len() > SEARCH_FROM {
-        text_field(ui, "", TextKind::Text, search, "Search", 40);
+        text_field(ui, "", TextKind::Text, search, "搜索", 40);
     }
     if filtered.is_empty() {
-        ui.label(RichText::new("No option has that.").size(12.0 * s).color(MUTED));
+        ui.label(RichText::new("没有匹配的选项。").size(12.0 * s).color(MUTED));
         return None;
     }
     let (chosen, multi): (Vec<usize>, bool) = match &item.kind {
